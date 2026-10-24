@@ -3,13 +3,18 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import AddHeader from '@/components/AddHeader.vue'
+import DeleteButton from '@/components/DeleteButton.vue'
+import SyncSummary from '@/components/SyncSummary.vue'
 import Toggle from '@/components/Toggle.vue'
-import { fromKey, minutesToTime, timeToMinutes, todayKey } from '@/services/dates'
+import { fromKey, minutesToTime, shortTime, timeToMinutes, todayKey } from '@/services/dates'
 import { useCategoriesStore } from '@/stores/categories'
 import { useGigsStore } from '@/stores/gigs'
 import { useTasksStore } from '@/stores/tasks'
 import { paletteVars } from '@/styles/palette'
 import type { TaskRow } from '@/types/db'
+
+/** Set on /edit/task/:id; the form then edits that task instead of adding one. */
+const props = defineProps<{ id?: string }>()
 
 const { t, locale } = useI18n()
 const route = useRoute()
@@ -19,16 +24,31 @@ const gigs = useGigsStore()
 const tasks = useTasksStore()
 
 const taskCategories = computed(() => categories.ofType('task'))
+const existing = props.id ? tasks.items.find((t) => t.id === props.id) : undefined
 
-const title = ref('')
-const categoryId = ref(taskCategories.value[0]?.id ?? null)
-const gigId = ref<string | null>(null)
-const date = ref(typeof route.query.date === 'string' ? route.query.date : todayKey())
-const time = ref('')
-const repeat = ref<TaskRow['repeat']>('none')
-const remind = ref(false)
-const showInCalendar = ref(true)
-const note = ref('')
+function leave() {
+  if (window.history.state?.back) router.back()
+  else router.replace('/')
+}
+
+// A to-do made from an event is edited through its event (rule 7 keeps them in step).
+if (existing?.source === 'event' && existing.event_id) {
+  router.replace(`/edit/event/${existing.event_id}`)
+} else if (props.id && !existing) {
+  router.replace('/')
+}
+
+const title = ref(existing?.title ?? '')
+const categoryId = ref(existing ? existing.category_id : (taskCategories.value[0]?.id ?? null))
+const gigId = ref<string | null>(existing?.gig_id ?? null)
+const date = ref(
+  existing?.date ?? (typeof route.query.date === 'string' ? route.query.date : todayKey()),
+)
+const time = ref(shortTime(existing?.time))
+const repeat = ref<TaskRow['repeat']>(existing?.repeat ?? 'none')
+const remind = ref(existing?.remind ?? false)
+const showInCalendar = ref(existing?.show_in_calendar ?? true)
+const note = ref(existing?.note ?? '')
 const saving = ref(false)
 const failed = ref(false)
 
@@ -77,24 +97,40 @@ const syncLines = computed(() => {
 
 const canSave = computed(() => !!title.value.trim() && !!date.value && !saving.value)
 
+async function remove() {
+  if (!existing) return
+  saving.value = true
+  failed.value = false
+  try {
+    await tasks.remove(existing.id)
+    leave()
+  } catch (error) {
+    console.error(error)
+    failed.value = true
+  } finally {
+    saving.value = false
+  }
+}
+
 async function save() {
   if (!canSave.value) return
   saving.value = true
   failed.value = false
+  const fields = {
+    title: title.value.trim(),
+    category_id: categoryId.value,
+    gig_id: gigId.value,
+    date: date.value,
+    time: time.value || null,
+    repeat: repeat.value,
+    remind: remind.value,
+    show_in_calendar: showInCalendar.value,
+    note: note.value.trim() || null,
+  }
   try {
-    await tasks.add({
-      title: title.value.trim(),
-      category_id: categoryId.value,
-      gig_id: gigId.value,
-      date: date.value,
-      time: time.value || null,
-      repeat: repeat.value,
-      remind: remind.value,
-      show_in_calendar: showInCalendar.value,
-      note: note.value.trim() || null,
-    })
-    if (window.history.state?.back) router.back()
-    else router.replace('/')
+    if (existing) await tasks.update(existing.id, fields)
+    else await tasks.add(fields)
+    leave()
   } catch (error) {
     console.error(error)
     failed.value = true
@@ -106,7 +142,11 @@ async function save() {
 
 <template>
   <main class="page">
-    <AddHeader :title="t('today.addTask')" :can-save="canSave" @save="save" />
+    <AddHeader
+      :title="t(existing ? 'today.editTask' : 'today.addTask')"
+      :can-save="canSave"
+      @save="save"
+    />
 
     <form class="page-body form" @submit.prevent="save">
       <div class="card field">
@@ -118,7 +158,7 @@ async function save() {
           type="text"
           enterkeyhint="done"
           :placeholder="t('addTask.placeholder')"
-          autofocus
+          :autofocus="!existing"
         />
       </div>
 
@@ -188,7 +228,7 @@ async function save() {
         </div>
         <fieldset class="row stacked">
           <legend class="row-legend">{{ t('addTask.repeat') }}</legend>
-          <div class="repeats">
+          <div class="grid-4">
             <button
               v-for="r in repeats"
               :key="r.value"
@@ -226,292 +266,17 @@ async function save() {
         <textarea id="task-note" v-model="note" class="note" rows="2" />
       </div>
 
-      <div class="sync">
-        <div class="sync-title">{{ t('common.syncTo') }}</div>
-        <div v-for="line in syncLines" :key="line" class="sync-line">
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.6"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M5 12l5 5 9-10" />
-          </svg>
-          <span>{{ line }}</span>
-        </div>
-      </div>
+      <SyncSummary :lines="syncLines" />
+
+      <DeleteButton
+        v-if="existing"
+        :label="t('addTask.deleteTask')"
+        :hint="existing.repeat !== 'none' ? t('addTask.deleteRepeatHint') : undefined"
+        :busy="saving"
+        @confirm="remove"
+      />
 
       <p v-if="failed" class="error" role="alert">{{ t('today.saveError') }}</p>
     </form>
   </main>
 </template>
-
-<style scoped>
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-fieldset {
-  margin: 0;
-  padding: 0;
-  border: none;
-  min-width: 0;
-}
-
-.card {
-  border-radius: 20px;
-  background: var(--surface);
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 14px 16px;
-}
-
-.field-label {
-  padding: 0;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--muted);
-}
-
-fieldset.field > .field-label {
-  float: left;
-  width: 100%;
-  margin-bottom: 8px;
-}
-
-.title-input {
-  padding: 4px 0;
-  border: none;
-  outline: none;
-  background: transparent;
-  color: var(--ink);
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.title-input::placeholder {
-  color: var(--done-dot);
-  font-weight: 500;
-}
-
-.group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.group-label {
-  float: left;
-  width: 100%;
-  margin-bottom: 8px;
-  padding: 0 4px;
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.cats {
-  clear: both;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.cat {
-  min-height: var(--tap);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border: 2px solid transparent;
-  border-radius: 16px;
-  background: var(--surface);
-  color: var(--ink-2);
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.cat.on {
-  border-color: var(--c-deep);
-  background: var(--c-fill);
-  color: var(--c-text);
-  font-weight: 700;
-}
-
-.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--c-deep);
-}
-
-.chips {
-  clear: both;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.chip {
-  min-height: 38px;
-  padding: 0 14px;
-  border: none;
-  border-radius: 19px;
-  background: var(--surface-muted);
-  color: var(--ink-2);
-  font-size: 13px;
-  font-weight: 500;
-  position: relative;
-}
-
-/* 38px chips, 44px hit area */
-.chip::after {
-  content: '';
-  position: absolute;
-  inset: -3px 0;
-}
-
-.chip.on {
-  background: var(--primary);
-  color: var(--on-primary);
-  font-weight: 700;
-}
-
-.rows {
-  padding: 4px 16px;
-}
-
-.row {
-  min-height: 52px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  font-size: 15px;
-}
-
-.row + .row {
-  border-top: 1px solid var(--divider);
-}
-
-.row.tall {
-  min-height: 60px;
-}
-
-.row.stacked {
-  display: block;
-  padding: 12px 0 14px;
-}
-
-.row-legend {
-  float: left;
-  width: 100%;
-  margin-bottom: 10px;
-  padding: 0;
-}
-
-.repeats {
-  clear: both;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 6px;
-}
-
-.repeats .chip {
-  padding: 0;
-}
-
-.row-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.sub {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.value-input {
-  min-height: var(--tap);
-  border: none;
-  outline: none;
-  background: transparent;
-  color: var(--ink);
-  font-size: 15px;
-  font-weight: 700;
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-.time-wrap {
-  display: flex;
-  align-items: center;
-}
-
-.clear {
-  width: var(--tap);
-  height: var(--tap);
-  border: none;
-  background: transparent;
-  color: var(--faint);
-  font-size: 20px;
-}
-
-.note {
-  padding: 2px 0;
-  border: none;
-  outline: none;
-  resize: none;
-  background: transparent;
-  color: var(--ink);
-  font-size: 15px;
-}
-
-.sync {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 12px 14px;
-  border-radius: 18px;
-  background: var(--chip);
-  color: var(--ink-2);
-}
-
-.sync-title {
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.sync-line {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-.sync-line svg {
-  flex-shrink: 0;
-  margin-top: 3px;
-}
-
-.error {
-  margin: 0;
-  padding: 12px 16px;
-  border-radius: 16px;
-  background: var(--overdue-bg);
-  color: var(--overdue-fg);
-  font-size: 14px;
-}
-</style>

@@ -1,0 +1,241 @@
+/* Shared layout for the add screens (SPEC 4.6). */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form fieldset {
+  margin: 0;
+  padding: 0;
+  border: none;
+  min-width: 0;
+}
+
+.form .card {
+  border-radius: 20px;
+  background: var(--surface);
+}
+
+.form .field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+}
+
+.form .field-label {
+  padding: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.form fieldset.field > .field-label {
+  float: left;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.form .title-input {
+  padding: 4px 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.form .title-input::placeholder {
+  color: var(--done-dot);
+  font-weight: 500;
+}
+
+.form .group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form .group-label {
+  float: left;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 0 4px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.form .cats {
+  clear: both;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.form .cat {
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.form .cat.on {
+  border-color: var(--c-deep);
+  background: var(--c-fill);
+  color: var(--c-text);
+  font-weight: 700;
+}
+
+.form .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--c-deep);
+}
+
+.form .chips {
+  clear: both;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.form .chip {
+  min-height: 38px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 19px;
+  background: var(--surface-muted);
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 500;
+  position: relative;
+}
+
+/* 38px chips, 44px hit area */
+.form .chip::after {
+  content: '';
+  position: absolute;
+  inset: -3px 0;
+}
+
+.form .chip.on {
+  background: var(--primary);
+  color: var(--on-primary);
+  font-weight: 700;
+}
+
+.form .rows {
+  padding: 4px 16px;
+}
+
+.form .row {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 15px;
+}
+
+.form .row + .row {
+  border-top: 1px solid var(--divider);
+}
+
+.form .row.tall {
+  min-height: 60px;
+}
+
+.form .row.stacked {
+  display: block;
+  padding: 12px 0 14px;
+}
+
+.form .row-legend {
+  float: left;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 0;
+}
+
+.form .grid-4 {
+  clear: both;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.form .grid-4 .chip {
+  padding: 0;
+}
+
+.form .row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.form .sub {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.form .value-input {
+  min-height: var(--tap);
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 700;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.form .time-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.form .clear {
+  width: var(--tap);
+  height: var(--tap);
+  border: none;
+  background: transparent;
+  color: var(--faint);
+  font-size: 20px;
+}
+
+.form .note {
+  padding: 2px 0;
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.form .error {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: var(--overdue-bg);
+  color: var(--overdue-fg);
+  font-size: 14px;
+}
+
+.form .value-input.plain {
+  min-width: 0;
+  flex: 1;
+  font-weight: 400;
+}

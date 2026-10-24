@@ -26,6 +26,18 @@ const DEFAULTS: Record<string, Row> = {
     gig_kind: null,
     event_id: null,
   },
+  events: {
+    category_id: null,
+    all_day: true,
+    start_time: null,
+    end_time: null,
+    place: null,
+    remind: 'none',
+    add_to_today: false,
+    source: 'manual',
+    gig_id: null,
+    gig_kind: null,
+  },
 }
 
 let nextId = 1

@@ -8,6 +8,7 @@ import { useSettingsStore } from './stores/settings'
 
 import './styles/tokens.css'
 import './styles/base.css'
+import './styles/form.css'
 
 const app = createApp(App)
 

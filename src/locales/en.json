@@ -25,7 +25,9 @@
     "soundOn": "Sound on, tap to mute",
     "soundOff": "Sound off, tap to turn on",
     "settings": "Settings",
-    "appName": "Planner"
+    "appName": "Planner",
+    "edit": "Edit",
+    "deleteConfirm": "Delete?"
   },
   "category": {
     "work": "Work",
@@ -77,7 +79,9 @@
     "emptyCake": "Add a to-do to start your cake",
     "cakeAria": "{dessert}, {done} of {total} layers stacked",
     "previewDessert": "Show {dessert}",
-    "saveError": "Couldn’t save. Check your connection and try again."
+    "saveError": "Couldn’t save. Check your connection and try again.",
+    "editTask": "Edit task",
+    "actionsFor": "Actions for {title}"
   },
   "calendar": {
     "title": "{month} {year}",
@@ -89,7 +93,14 @@
     "dayN": "Day {n}",
     "missed": "Missed",
     "noTodos": "No to-dos this day",
-    "addEvent": "Add event"
+    "addEvent": "Add event",
+    "allDay": "All day",
+    "more": "+{n}",
+    "dayAria": "{date}: {events}",
+    "done": "Done",
+    "filterLabel": "Filter events by category",
+    "todoDone": "Done {done} / {total}",
+    "editEvent": "Edit event"
   },
   "habits": {
     "title": "Habits",
@@ -216,6 +227,36 @@
     "syncTodayRepeat": "To-dos {repeat} from {date}; finishing it stacks a {category} layer",
     "syncCalendar": "The calendar’s to-do list on {date}",
     "syncGig": "Related to-dos for “{brand}” on the Gigs page",
-    "syncRemind": "Push reminder at {time}"
+    "syncRemind": "Push reminder at {time}",
+    "deleteTask": "Delete this task",
+    "deleteRepeatHint": "Deletes every repeat of this task"
+  },
+  "addEvent": {
+    "name": "Event name",
+    "placeholder": "e.g. Tokyo trip",
+    "category": "Category",
+    "allDay": "All day",
+    "start": "Starts",
+    "end": "Ends",
+    "startTime": "Start time",
+    "endTime": "End time",
+    "place": "Place (optional)",
+    "placePlaceholder": "e.g. Taoyuan Airport T2",
+    "remind": "Reminder",
+    "remindNone": "None",
+    "remindHour": "1 hour before",
+    "remindDay": "Day before",
+    "remindWeek": "Week before",
+    "addToToday": "Also add to today’s to-dos",
+    "addToTodaySub": "Shows in the to-do list on each day, ready to tick off for the cake",
+    "syncRange": "A {category} bar across {range} in the calendar",
+    "syncDay": "A {category} event on {date} in the calendar",
+    "syncRemind": "Push reminder: {remind}",
+    "syncTodayRange": "“{title}” on the to-do list every day of it",
+    "syncTodayDay": "“{title}” on the to-do list on {date}",
+    "untitled": "this event",
+    "deleteEvent": "Delete this event",
+    "deleteHint": "Its to-dos on the Today page go too",
+    "notFound": "This event no longer exists"
   }
 }

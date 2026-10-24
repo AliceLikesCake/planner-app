@@ -57,10 +57,15 @@ export function useTable<T extends { id: string }, New extends object>(
     items.value = items.value.filter((item) => item.id !== id)
   }
 
+  /** Drops rows locally that the database already removed (e.g. by ON DELETE CASCADE). */
+  function forget(predicate: (item: T) => boolean) {
+    items.value = items.value.filter((item) => !predicate(item))
+  }
+
   function reset() {
     items.value = []
     loaded.value = false
   }
 
-  return { items, loaded, load, add, update, remove, reset }
+  return { items, loaded, load, add, update, remove, forget, reset }
 }

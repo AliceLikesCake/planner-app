@@ -51,6 +51,18 @@ const router = createRouter({
     { path: '/add/habit', name: 'add-habit', component: () => import('@/views/add/AddHabit.vue') },
     { path: '/add/gig', name: 'add-gig', component: () => import('@/views/add/AddGig.vue') },
     { path: '/add/money', name: 'add-money', component: () => import('@/views/add/AddMoney.vue') },
+    {
+      path: '/edit/task/:id',
+      name: 'edit-task',
+      component: () => import('@/views/add/AddTask.vue'),
+      props: true,
+    },
+    {
+      path: '/edit/event/:id',
+      name: 'edit-event',
+      component: () => import('@/views/add/AddEvent.vue'),
+      props: true,
+    },
 
     {
       path: '/settings/categories',

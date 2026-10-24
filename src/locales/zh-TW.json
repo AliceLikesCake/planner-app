@@ -25,7 +25,9 @@
     "soundOn": "音效開啟，點一下關閉",
     "soundOff": "音效關閉，點一下開啟",
     "settings": "設定",
-    "appName": "Planner"
+    "appName": "Planner",
+    "edit": "編輯",
+    "deleteConfirm": "確定刪除？"
   },
   "category": {
     "work": "工作",
@@ -77,7 +79,9 @@
     "emptyCake": "新增待辦，開始疊蛋糕",
     "cakeAria": "{dessert}，已疊上 {done} / {total} 層",
     "previewDessert": "看{dessert}",
-    "saveError": "沒有存到，請檢查網路後再試一次"
+    "saveError": "沒有存到，請檢查網路後再試一次",
+    "editTask": "編輯待辦",
+    "actionsFor": "{title} 的操作"
   },
   "calendar": {
     "title": "{year}年{month}月",
@@ -89,7 +93,14 @@
     "dayN": "第 {n} 天",
     "missed": "未完成",
     "noTodos": "這天沒有待辦事項",
-    "addEvent": "新增行程"
+    "addEvent": "新增行程",
+    "allDay": "整天",
+    "more": "+{n}",
+    "dayAria": "{date}，{events}",
+    "done": "已完成",
+    "filterLabel": "行程類別篩選",
+    "todoDone": "完成 {done} / {total}",
+    "editEvent": "編輯行程"
   },
   "habits": {
     "title": "習慣打卡",
@@ -216,6 +227,36 @@
     "syncTodayRepeat": "從 {date} 起{repeat}出現在今日待辦，完成時疊上一層{category}蛋糕",
     "syncCalendar": "月曆 {date} 的待辦事項清單",
     "syncGig": "接案頁「{brand}」的相關待辦",
-    "syncRemind": "{time} 推播提醒"
+    "syncRemind": "{time} 推播提醒",
+    "deleteTask": "刪除這個待辦",
+    "deleteRepeatHint": "重複的待辦會連同之後每一次一起刪除"
+  },
+  "addEvent": {
+    "name": "行程名稱",
+    "placeholder": "例如：東京旅行",
+    "category": "類別",
+    "allDay": "整天",
+    "start": "開始",
+    "end": "結束",
+    "startTime": "開始時間",
+    "endTime": "結束時間",
+    "place": "地點（選填）",
+    "placePlaceholder": "例如：桃園機場 第二航廈",
+    "remind": "提醒",
+    "remindNone": "不提醒",
+    "remindHour": "1 小時前",
+    "remindDay": "前一天",
+    "remindWeek": "一週前",
+    "addToToday": "同時加到今日待辦",
+    "addToTodaySub": "行程當天會出現在待辦清單，可以打勾疊蛋糕",
+    "syncRange": "月曆 {range} 會畫成一條{category}長條",
+    "syncDay": "月曆 {date} 的{category}行程",
+    "syncRemind": "{remind}推播提醒",
+    "syncTodayRange": "每一天的今日待辦都會出現「{title}」",
+    "syncTodayDay": "{date} 的今日待辦會出現「{title}」",
+    "untitled": "這個行程",
+    "deleteEvent": "刪除這個行程",
+    "deleteHint": "它產生的今日待辦也會一起刪除",
+    "notFound": "找不到這個行程"
   }
 }

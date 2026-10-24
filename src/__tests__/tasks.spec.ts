@@ -82,4 +82,14 @@ describe('tasks store', () => {
     await reloaded.setDone(reloaded.items[0]!, '2026-10-24', false)
     expect(fakeDb.rows('task_completions')).toHaveLength(0)
   })
+
+  it('deleting a repeating task drops its ticks too', async () => {
+    const tasks = useTasksStore()
+    const task = await tasks.add({ title: 'Stretch', date: '2026-10-20', repeat: 'day' })
+    await tasks.setDone(task, '2026-10-24', true)
+
+    await tasks.remove(task.id)
+    expect(tasks.items).toHaveLength(0)
+    expect(tasks.completions).toHaveLength(0)
+  })
 })

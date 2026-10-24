@@ -85,10 +85,16 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   }
 
+  /** Deletes a task; the database cascades its per-day ticks, the store follows. */
+  async function remove(id: string) {
+    await table.remove(id)
+    completions.value = completions.value.filter((c) => c.task_id !== id)
+  }
+
   function reset() {
     table.reset()
     completions.value = []
   }
 
-  return { ...table, completions, load, occurrencesOn, setDone, reset }
+  return { ...table, completions, load, occurrencesOn, setDone, remove, reset }
 })

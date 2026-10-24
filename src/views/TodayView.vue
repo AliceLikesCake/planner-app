@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import Cake from '@/components/cake/Cake.vue'
 import TaskRow from '@/components/TaskRow.vue'
 import { computeLayers, type CakeTask } from '@/components/cake/layers'
@@ -19,6 +20,7 @@ import { useTasksStore, type TaskOccurrence } from '@/stores/tasks'
 import { CAKE_TONES, isPaletteKey } from '@/styles/palette'
 
 const { t, locale } = useI18n()
+const router = useRouter()
 const settings = useSettingsStore()
 const tasks = useTasksStore()
 const categories = useCategoriesStore()
@@ -104,6 +106,18 @@ async function toggleSound() {
   if (next) playSoundOn()
   try {
     await settings.update({ sound: next })
+  } catch {
+    showError()
+  }
+}
+
+// Only one row is swiped open at a time.
+const openId = ref<string | null>(null)
+
+async function remove(item: TaskOccurrence) {
+  openId.value = null
+  try {
+    await tasks.remove(item.task.id)
   } catch {
     showError()
   }
@@ -233,7 +247,11 @@ async function toggle(item: TaskOccurrence) {
         :category-name="categories.name(categories.byId(item.task.category_id))"
         :done="item.done"
         :bounce="item.task.id === lastDoneId"
+        :open="openId === item.task.id"
+        @update:open="openId = $event ? item.task.id : null"
         @toggle="toggle(item)"
+        @edit="router.push(`/edit/task/${item.task.id}`)"
+        @delete="remove(item)"
       />
       <p v-if="!items.length" class="empty">{{ t('today.empty') }}</p>
     </div>
