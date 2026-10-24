@@ -44,7 +44,7 @@ const payText = computed(() => {
   return t(overdue.value ? 'gigs.dueOverdue' : 'gigs.dueOn', { date: md(g.due_date) })
 })
 
-// 合約 → 勞報單 → 交稿 → 上線 → 入帳 (SPEC 4.4)
+// 合約 → 交稿 → 上線 → 勞報單 → 入帳 (DECISIONS 56)
 const steps = computed(() =>
   GIG_STEPS.map((key) => {
     const on = isStepDone(props.gig, key)

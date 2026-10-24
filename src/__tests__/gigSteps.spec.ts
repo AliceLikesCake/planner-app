@@ -28,17 +28,19 @@ describe('gig step circles', () => {
     })
   })
 
-  it('ticking 交稿 only fills in what is still missing before it', () => {
-    expect(stepPatch({ ...none, contract_signed: true }, 'delivered', TODAY)).toEqual({
-      labor_signed: true,
+  it('ticking 勞報單 fills in what is still missing before it', () => {
+    expect(stepPatch({ ...none, contract_signed: true }, 'labor', TODAY)).toEqual({
       delivered: true,
+      is_live: true,
+      labor_signed: true,
     })
   })
 
-  it('unticking 交稿 unticks 上線 and 入帳 too, but not the paperwork', () => {
+  it('unticking 交稿 unticks 上線, 勞報單 and 入帳 too, but not the contract', () => {
     expect(stepPatch(all, 'delivered', TODAY)).toEqual({
       delivered: false,
       is_live: false,
+      labor_signed: false,
       paid_at: null,
     })
   })

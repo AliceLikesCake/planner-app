@@ -94,7 +94,7 @@ describe('export sheets', () => {
     })
 
     const [gigs] = buildSheets(['gigs'], OCT, TODAY)
-    expect(gigs!.rows.map((r) => [r[0], r[3], r[7], r[8], r[9], r[10]])).toEqual([
+    expect(gigs!.rows.map((r) => [r[0], r[3], r[7], r[8], r[9], r[12]])).toEqual([
       ['品牌 A', 8000, '2026-10-18', '已入帳', '是', '否'],
       ['品牌 B', 12000, '', '逾期未入帳', '否', '否'],
     ])

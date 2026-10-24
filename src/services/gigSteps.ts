@@ -1,10 +1,10 @@
-// The five step circles on a gig card run in order: 合約 → 勞報單 → 交稿 → 上線 → 入帳.
+// The five step circles on a gig card run in order: 合約 → 交稿 → 上線 → 勞報單 → 入帳.
 // Ticking a step ticks every step before it; unticking one unticks every step after it
-// (DECISIONS 46).
+// (DECISIONS 46, order from DECISIONS 56).
 import type { DateKey } from './dates'
 import type { GigRow } from '@/types/db'
 
-export const GIG_STEPS = ['contract', 'labor', 'delivered', 'live', 'paid'] as const
+export const GIG_STEPS = ['contract', 'delivered', 'live', 'labor', 'paid'] as const
 export type GigStep = (typeof GIG_STEPS)[number]
 
 type StepFields = Pick<

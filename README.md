@@ -27,7 +27,7 @@ Traditional Chinese and English, switchable in Settings.
 - Monthly record per habit with current and best streaks (unscheduled days don't break a streak).
 
 **Gigs** (brand collaborations)
-- Cards with five steps in order — contract → labor form → delivery → live → paid — that tick and untick together.
+- Cards with five steps in order — contract → delivery → live → labor form → paid — that tick and untick together.
 - Paid / unpaid / overdue status, totals for the month and year, filters by payment status and product category.
 
 **Money**
