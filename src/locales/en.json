@@ -24,7 +24,8 @@
     "syncTo": "After saving, this also updates",
     "soundOn": "Sound on, tap to mute",
     "soundOff": "Sound off, tap to turn on",
-    "settings": "Settings"
+    "settings": "Settings",
+    "appName": "Planner"
   },
   "category": {
     "work": "Work",
@@ -168,5 +169,16 @@
     "langZh": "中文",
     "langEn": "English",
     "accountBackup": "Account & backup"
+  },
+  "auth": {
+    "tagline": "To-dos, plans, habits, gigs and money in one place",
+    "google": "Sign in with Google",
+    "loading": "Loading…",
+    "loadError": "Couldn’t load your data. Check your connection and try again.",
+    "signInError": "Sign-in failed. Please try again.",
+    "retry": "Try again",
+    "notConfigured": "Supabase isn’t connected yet. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to .env.local in the project root, then restart.",
+    "signOut": "Sign out",
+    "signedInWithGoogle": "Signed in with Google"
   }
 }

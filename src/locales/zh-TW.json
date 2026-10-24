@@ -24,7 +24,8 @@
     "syncTo": "儲存後會同步到",
     "soundOn": "音效開啟，點一下關閉",
     "soundOff": "音效關閉，點一下開啟",
-    "settings": "設定"
+    "settings": "設定",
+    "appName": "Planner"
   },
   "category": {
     "work": "工作",
@@ -168,5 +169,16 @@
     "langZh": "中文",
     "langEn": "English",
     "accountBackup": "帳號與備份"
+  },
+  "auth": {
+    "tagline": "待辦、行程、習慣、接案和記帳，一個地方搞定",
+    "google": "用 Google 登入",
+    "loading": "載入中…",
+    "loadError": "資料載入失敗，請檢查網路後再試一次",
+    "signInError": "登入失敗，請再試一次",
+    "retry": "再試一次",
+    "notConfigured": "還沒連上 Supabase。請在專案根目錄的 .env.local 填入 VITE_SUPABASE_URL 和 VITE_SUPABASE_ANON_KEY，然後重新啟動。",
+    "signOut": "登出",
+    "signedInWithGoogle": "用 Google 帳號登入"
   }
 }

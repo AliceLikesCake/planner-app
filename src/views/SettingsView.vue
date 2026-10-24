@@ -4,14 +4,17 @@ import { useI18n } from 'vue-i18n'
 import BackHeader from '@/components/BackHeader.vue'
 import SegmentedControl from '@/components/SegmentedControl.vue'
 import { useSettingsStore } from '@/stores/settings'
+import { useAuthStore } from '@/stores/auth'
 import type { Locale } from '@/i18n'
 
 const { t } = useI18n()
 const settings = useSettingsStore()
+const auth = useAuthStore()
 
 const lang = computed<Locale>({
   get: () => settings.lang,
-  set: (value) => settings.setLang(value),
+  // The language switches immediately; a failed save only means it isn't stored online.
+  set: (value) => void settings.setLang(value).catch(console.error),
 })
 
 const langOptions = computed(() => [
@@ -65,6 +68,7 @@ const sections = [
         </span>
         <span class="account-text">
           <span class="account-name">{{ t('settings.account') }}</span>
+          <span v-if="auth.user?.email" class="account-sub">{{ auth.user.email }}</span>
         </span>
         <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M9 5l7 7-7 7" />
@@ -135,6 +139,17 @@ const sections = [
 .account-text {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.account-sub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  color: var(--muted);
 }
 
 .account-name {
