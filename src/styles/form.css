@@ -260,6 +260,11 @@
   font-size: 14px;
 }
 
+/* iPhone Safari ignores text-align on date and time inputs; their value box needs it too. */
+.form .value-input::-webkit-date-and-time-value {
+  text-align: right;
+}
+
 .form .value-input.plain {
   min-width: 0;
   flex: 1;

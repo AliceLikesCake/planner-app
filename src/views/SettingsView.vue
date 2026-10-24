@@ -446,6 +446,10 @@ const sections = computed<{ title: string; rows: Row[] }[]>(() => [
   text-align: right;
 }
 
+.time-input::-webkit-date-and-time-value {
+  text-align: right;
+}
+
 .version {
   margin: 0;
   padding: 4px 0 8px;

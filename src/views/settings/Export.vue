@@ -248,6 +248,10 @@ const rangeText = computed(() => `${range.value.start} – ${range.value.end}`.r
   min-height: 36px;
 }
 
+.custom-field .value-input::-webkit-date-and-time-value {
+  text-align: left;
+}
+
 .contents {
   padding: 6px 16px;
 }
