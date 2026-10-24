@@ -1,0 +1,147 @@
+/* Planner App design tokens — flat pastel. Only the cake uses gradients/shadows. */
+@import url('https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap');
+
+:root {
+  /* type */
+  --font-display: 'Huninn', 'Noto Sans TC', sans-serif;
+  --font-body: 'Noto Sans TC', system-ui, sans-serif;
+
+  /* surfaces */
+  --bg: #faf7f2;
+  --surface: #ffffff;
+  --surface-muted: #f5f1ea;
+  --chip: #f1ece4;
+  --divider: #f3eee7;
+  --dashed: #d3cbbf;
+
+  /* text */
+  --ink: #3d3a36;
+  --ink-2: #5a544c;
+  --muted: #6e6860;
+  --faint: #8c857b;
+
+  /* done / disabled */
+  --done-dot: #a8a198;
+  --done-chip: #e6e2dc;
+  --done-row: #f3f0eb;
+
+  /* actions */
+  --primary: #3d3a36;
+  --on-primary: #ffffff;
+  --switch-on: #8db58f;
+  --switch-off: #d9d2c7;
+
+  /* status */
+  --paid-bg: #d6eee8;
+  --paid-fg: #36705f;
+  --paid-dot: #5e9f8e;
+  --pending-bg: #ece9e4;
+  --pending-fg: #4f4a44;
+  --pending-dot: #9c958c;
+  --overdue-bg: #f5dada;
+  --overdue-fg: #8e3f3f;
+  --overdue-dot: #c77878;
+  --missed-fg: #a0605a;
+  --budget-bar: #e0a07f;
+
+  /* palette (fill / text / deep) */
+  --blue-fill: #dce8f5;
+  --blue-text: #3e5f8f;
+  --blue-deep: #7fa3cf;
+  --lav-fill: #e8e0f3;
+  --lav-text: #65508f;
+  --lav-deep: #a891cc;
+  --green-fill: #ddebdd;
+  --green-text: #3d6442;
+  --green-deep: #8db58f;
+  --peach-fill: #f8e1d4;
+  --peach-text: #8a4a2b;
+  --peach-deep: #e0a07f;
+  --butter-fill: #f6ebc8;
+  --butter-text: #7f6224;
+  --butter-deep: #d9bc6e;
+  --rose-fill: #f5dada;
+  --rose-text: #8e3f3f;
+  --rose-deep: #de9c9c;
+  --mint-fill: #d6eee8;
+  --mint-text: #36705f;
+  --mint-deep: #7dbfb0;
+  --pink-fill: #f6dde9;
+  --pink-text: #8a3d62;
+  --pink-deep: #d99bb8;
+  --sand-fill: #ede8e1;
+  --sand-text: #5a544c;
+  --sand-deep: #b5ada2;
+
+  /* cake layer tones */
+  --cake-work: #bccde6;
+  --cake-gig: #d5c8ea;
+  --cake-study: #c6dbb6;
+  --cake-life: #f0de9f;
+  --cake-health: #efc1c1;
+
+  /* shape */
+  --radius-card: 22px;
+  --radius-lg: 28px;
+  --radius-pill: 999px;
+  --tap: 44px;
+  --nav-height: 84px;
+  --fab-size: 56px;
+}
+
+/* category -> palette mapping */
+.cat-work {
+  --c-fill: var(--blue-fill);
+  --c-text: var(--blue-text);
+  --c-deep: var(--blue-deep);
+}
+.cat-gig {
+  --c-fill: var(--lav-fill);
+  --c-text: var(--lav-text);
+  --c-deep: var(--lav-deep);
+}
+.cat-study {
+  --c-fill: var(--green-fill);
+  --c-text: var(--green-text);
+  --c-deep: var(--green-deep);
+}
+.cat-life {
+  --c-fill: var(--butter-fill);
+  --c-text: var(--butter-text);
+  --c-deep: var(--butter-deep);
+}
+.cat-health {
+  --c-fill: var(--rose-fill);
+  --c-text: var(--rose-text);
+  --c-deep: var(--rose-deep);
+}
+.cat-date {
+  --c-fill: var(--butter-fill);
+  --c-text: var(--butter-text);
+  --c-deep: var(--butter-deep);
+}
+.cat-travel {
+  --c-fill: var(--mint-fill);
+  --c-text: var(--mint-text);
+  --c-deep: var(--mint-deep);
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+button,
+input,
+textarea {
+  font-family: inherit;
+}
+.num {
+  font-variant-numeric: tabular-nums;
+}
+.display {
+  font-family: var(--font-display);
+}

@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>接案管理</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Huninn&amp;family=Noto+Sans+TC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3D3A36}a:hover{color:#1F1D1B}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; display: flex; flex-direction: column; background: #FAF7F2; font-family: 'Noto Sans TC', system-ui, sans-serif; color: #3D3A36; overflow: hidden">
+  <div style="flex: 1; overflow-y: auto; padding: 50px 16px 110px; display: flex; flex-direction: column; gap: 14px">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 4px">
+      <div style="font-family: 'Huninn', 'Noto Sans TC', sans-serif; font-size: 26px">接案管理</div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+      <div style="background: #D6EEE8; color: #36705F; border-radius: 20px; padding: 12px; display: flex; flex-direction: column; gap: 4px">
+        <span style="font-size: 12px; font-weight: 700">本月已入帳</span>
+        <span style="font-family: 'Huninn', 'Noto Sans TC', sans-serif; font-size: 19px; font-variant-numeric: tabular-nums">{{paidMonth}}</span>
+      </div>
+      <div style="background: #ECE9E4; color: #4F4A44; border-radius: 20px; padding: 12px; display: flex; flex-direction: column; gap: 4px">
+        <span style="font-size: 12px; font-weight: 700">待入帳</span>
+        <span style="font-family: 'Huninn', 'Noto Sans TC', sans-serif; font-size: 19px; font-variant-numeric: tabular-nums">{{unpaid}}</span>
+      </div>
+      <div style="background: #E8E0F3; color: #65508F; border-radius: 20px; padding: 12px; display: flex; flex-direction: column; gap: 4px">
+        <span style="font-size: 12px; font-weight: 700">今年已入帳</span>
+        <span style="font-family: 'Huninn', 'Noto Sans TC', sans-serif; font-size: 19px; font-variant-numeric: tabular-nums">{{paidYear}}</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; gap: 8px; padding: 0 2px">
+        <sc-for list="{{filters}}" as="f" hint-placeholder-count="3">
+          <button onClick="{{f.pick}}" aria-pressed="{{f.pressed}}" style="{{f.style}}">{{f.label}}</button>
+        </sc-for>
+      </div>
+      <div style="display: flex; gap: 6px; overflow-x: auto; padding: 0 2px">
+        <sc-for list="{{catFilters}}" as="cf" hint-placeholder-count="6">
+          <button onClick="{{cf.pick}}" aria-pressed="{{cf.pressed}}" style="{{cf.style}}">{{cf.label}}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <sc-for list="{{deals}}" as="d" hint-placeholder-count="3">
+      <div style="background: #FFFFFF; border-radius: 22px; padding: 16px 16px 14px; display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; align-items: flex-start; gap: 12px">
+          <span style="{{d.catIcon}}">
+            <sc-if value="{{d.isBeauty}}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 21h7v-8h-7z"/><path d="M9.5 13V8.5L14.5 5v8"/></svg></sc-if>
+            <sc-if value="{{d.isSkin}}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="9" width="10" height="12" rx="3"/><path d="M10 9V6h4v3M11 3.5h3"/></svg></sc-if>
+            <sc-if value="{{d.isFood}}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9h11v4.5a5.5 5.5 0 0 1-11 0z"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8 3.5v2.5M11 3v3M14 3.5v2.5"/></svg></sc-if>
+            <sc-if value="{{d.isHome}}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-6 8 6v8H4zM10 19v-5h4v5"/></svg></sc-if>
+            <sc-if value="{{d.isTech}}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="2.5"/><path d="M11 17.5h2"/></svg></sc-if>
+            <sc-if value="{{d.isFashion}}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 4L4 7l2 3.5 2-1V20h8V9.5l2 1L20 7l-4.5-3c-.6 1.5-2 2.5-3.5 2.5S9.1 5.5 8.5 4z"/></svg></sc-if>
+          </span>
+          <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+            <div style="font-size: 17px; font-weight: 700">{{d.brand}}</div>
+            <div style="font-size: 13px; color: #6E6860">{{d.catName}} · {{d.kind}}</div>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0">
+            <span style="font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums">{{d.amount}}</span>
+            <span style="{{d.pill}}">{{d.payTitle}}</span>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px">
+          <sc-for list="{{d.steps}}" as="sp" hint-placeholder-count="5">
+            <button onClick="{{sp.toggle}}" aria-pressed="{{sp.pressed}}" aria-label="{{sp.aria}}" style="height: 56px; border: none; background: transparent; padding: 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px">
+              <span style="{{sp.dot}}">
+                <sc-if value="{{sp.on}}" hint-placeholder-val="{{ false }}">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>
+                </sc-if>
+              </span>
+              <span style="{{sp.label}}">{{sp.name}}</span>
+            </button>
+          </sc-for>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; gap: 8px; border-top: 1px solid #F1ECE4; padding-top: 10px; font-size: 12px; color: #6E6860; font-variant-numeric: tabular-nums">
+          <span>{{d.liveText}}</span>
+          <span style="{{d.payMetaStyle}}">{{d.payMeta}}</span>
+        </div>
+      </div>
+    </sc-for>
+    <sc-if value="{{empty}}" hint-placeholder-val="{{ false }}">
+      <div style="background: #FFFFFF; border-radius: 22px; padding: 20px; text-align: center; font-size: 14px; color: #6E6860">這裡目前沒有合作案</div>
+    </sc-if>
+  </div>
+
+  <a href="AddCollab.dc.html" aria-label="新增接案" style="position: absolute; right: 20px; bottom: 100px; width: 56px; height: 56px; border-radius: 28px; background: #3D3A36; display: flex; align-items: center; justify-content: center; z-index: 5">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+  </a>
+
+  <nav style="height: 84px; flex-shrink: 0; background: #FFFFFF; border-radius: 28px 28px 0 0; box-shadow: 0 -4px 20px rgba(61,58,54,0.06); display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 8px 6px 14px; box-sizing: border-box">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; color: #6E6860; font-size: 11px; font-weight: 500">
+      <span style="width: 52px; height: 32px; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16M5 20v-6h14v6M7 14v-4h10v4M12 10V7"/><path d="M12 4.5c.8.6.8 1.6 0 2"/></svg></span>
+      <span>今日</span>
+    </a>
+    <a href="Calendar.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; color: #6E6860; font-size: 11px; font-weight: 500">
+      <span style="width: 52px; height: 32px; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="4"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></span>
+      <span>月曆</span>
+    </a>
+    <a href="Goals.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; color: #6E6860; font-size: 11px; font-weight: 500">
+      <span style="width: 52px; height: 32px; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></span>
+      <span>習慣</span>
+    </a>
+    <a href="Collabs.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; color: #3D3A36; font-size: 11px; font-weight: 700">
+      <span style="width: 52px; height: 32px; border-radius: 16px; background: #F1ECE4; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12.5V4.5h8l9 9-8 8z"/><circle cx="8" cy="9" r="1.5"/></svg></span>
+      <span>接案</span>
+    </a>
+    <a href="Money.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; color: #6E6860; font-size: 11px; font-weight: 500">
+      <span style="width: 52px; height: 32px; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="4"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1.2"/></svg></span>
+      <span>記帳</span>
+    </a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      filter: 'all',
+      paid: { c: '10/20', e: '09/30' },
+      docs: {
+        a: { contract: true, labor: false, sent: true, live: false },
+        b: { contract: true, labor: true, sent: true, live: true },
+        c: { contract: true, labor: true, sent: true, live: true },
+        d: { contract: false, labor: false, sent: false, live: false },
+        e: { contract: true, labor: true, sent: true, live: true },
+        f: { contract: true, labor: false, sent: false, live: false }
+      },
+      cat: 'all'
+    };
+  }
+  renderVals() {
+    var self = this;
+    var TODAY = '10/22';
+    var raw = [
+      { id: 'a', brand: '品牌 A', cat: 'skin', kind: 'IG 貼文＋限動', amount: 8000, live: '10/25', due: '11/30' },
+      { id: 'b', brand: '品牌 B', cat: 'food', kind: 'IG Reels', amount: 12000, live: '10/15', due: '10/20' },
+      { id: 'c', brand: '品牌 C', cat: 'home', kind: 'IG 貼文', amount: 5000, live: '10/03', due: '10/20' },
+      { id: 'd', brand: '品牌 D', cat: 'beauty', kind: '限動 ×3', amount: 6000, live: '', due: '' },
+      { id: 'e', brand: '品牌 E', cat: 'food', kind: 'IG Reels', amount: 9500, live: '09/12', due: '09/30' },
+      { id: 'f', brand: '品牌 F', cat: 'tech', kind: '開箱影片', amount: 15000, live: '11/08', due: '12/15' }
+    ];
+    var CATS = {
+      beauty: { name: '彩妝', fill: '#F5DADA', text: '#8E3F3F' },
+      skin: { name: '保養', fill: '#F6DDE9', text: '#8A3D62' },
+      food: { name: '食品飲料', fill: '#F6EBC8', text: '#7F6224' },
+      home: { name: '生活用品', fill: '#DDEBDD', text: '#3D6442' },
+      tech: { name: '3C 家電', fill: '#DCE8F5', text: '#3E5F8F' },
+      fashion: { name: '服飾配件', fill: '#E8E0F3', text: '#65508F' }
+    };
+    var cf = this.state.cat || 'all';
+    var paid = this.state.paid;
+    var docs = this.state.docs;
+    var f = this.state.filter;
+    function money(n) { return 'NT$' + n.toLocaleString('en-US'); }
+    var paidMonth = 0, unpaid = 0, paidYear = 48000;
+    raw.forEach(function (d) {
+      if (paid[d.id]) { paidYear += d.amount; if (paid[d.id].indexOf('10/') === 0) paidMonth += d.amount; }
+      else unpaid += d.amount;
+    });
+    var stepDefs = [
+      { key: 'contract', name: '合約', on: '已簽', off: '未簽' },
+      { key: 'labor', name: '勞報單', on: '已簽', off: '未簽' },
+      { key: 'sent', name: '交稿', on: '已交稿', off: '未交稿' },
+      { key: 'live', name: '上線', on: '已上線', off: '未上線' },
+      { key: 'paid', name: '入帳', on: '已入帳', off: '待入帳' }
+    ];
+    var deals = raw.filter(function (d) {
+      if (f === 'unpaid') return !paid[d.id];
+      if (cf !== 'all' && d.cat !== cf) return false;
+      if (f === 'paid') return !!paid[d.id];
+      return true;
+    }).sort(function (x, y) { return (paid[x.id] ? 1 : 0) - (paid[y.id] ? 1 : 0); }).map(function (d) {
+      var isPaid = !!paid[d.id];
+      var overdue = !isPaid && d.due && d.due < TODAY;
+      var dd = docs[d.id];
+      var pillTone = isPaid ? ['#D6EEE8', '#36705F'] : (overdue ? ['#F5DADA', '#8E3F3F'] : ['#ECE9E4', '#4F4A44']);
+      return {
+        brand: d.brand, kind: d.kind,
+        catName: CATS[d.cat].name,
+        isBeauty: d.cat === 'beauty', isSkin: d.cat === 'skin', isFood: d.cat === 'food', isHome: d.cat === 'home', isTech: d.cat === 'tech', isFashion: d.cat === 'fashion',
+        catIcon: 'width: 44px; height: 44px; border-radius: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: ' + CATS[d.cat].fill + '; color: ' + CATS[d.cat].text,
+        amount: money(d.amount),
+        payTitle: isPaid ? '已入帳' : (overdue ? '逾期未入帳' : '待入帳'),
+        pill: 'font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 12px; background: ' + pillTone[0] + '; color: ' + pillTone[1],
+        liveText: d.live ? (dd.live ? d.live + ' 已上線' : '預計 ' + d.live + ' 上線') : '上線日待定',
+        payMeta: isPaid ? paid[d.id] + ' 入帳' : (d.due ? (overdue ? '應於 ' + d.due + ' 入帳' : '預計 ' + d.due + ' 入帳') : '入帳日待定'),
+        payMetaStyle: overdue ? 'color: #8E3F3F; font-weight: 700' : '',
+        steps: stepDefs.map(function (x) {
+          var on = x.key === 'paid' ? isPaid : !!dd[x.key];
+          var isPayStep = x.key === 'paid';
+          var offColor = isPayStep && overdue ? '#C77878' : '#D3CBBF';
+          var onColor = isPayStep ? '#5E9F8E' : '#8DB58F';
+          return {
+            on: on,
+            name: x.name,
+            pressed: on ? 'true' : 'false',
+            aria: x.name + '：' + (on ? x.on : x.off) + '，點一下切換',
+            dot: 'width: 26px; height: 26px; border-radius: 50%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; ' + (on ? 'background: ' + onColor : 'background: #FFFFFF; border: 2px solid ' + offColor),
+            label: 'font-size: 12px; white-space: nowrap; ' + (on ? 'color: #3D3A36; font-weight: 700' : (isPayStep && overdue ? 'color: #8E3F3F; font-weight: 700' : 'color: #8C857B')),
+            toggle: function () {
+              if (isPayStep) {
+                var np = Object.assign({}, self.state.paid);
+                if (np[d.id]) delete np[d.id]; else np[d.id] = TODAY;
+                self.setState({ paid: np });
+                return;
+              }
+              var nx = JSON.parse(JSON.stringify(self.state.docs));
+              nx[d.id][x.key] = !nx[d.id][x.key];
+              self.setState({ docs: nx });
+            }
+          };
+        })
+      };
+    });
+    var filters = [
+      { id: 'all', label: '全部' },
+      { id: 'unpaid', label: '待入帳' },
+      { id: 'paid', label: '已入帳' }
+    ].map(function (x) {
+      var on = x.id === f;
+      return {
+        label: x.label,
+        pressed: on ? 'true' : 'false',
+        pick: function () { self.setState({ filter: x.id }); },
+        style: 'flex-shrink: 0; height: 40px; padding: 0 18px; border-radius: 20px; font-size: 14px; cursor: pointer; border: none; background: ' + (on ? '#3D3A36' : '#F1ECE4') + '; color: ' + (on ? '#FFFFFF' : '#5A544C') + '; font-weight: ' + (on ? '700' : '500')
+      };
+    });
+    var catFilters = [{ id: 'all', name: '全部類別' }].concat(Object.keys(CATS).map(function (k) { return { id: k, name: CATS[k].name }; })).map(function (x) {
+      var on = x.id === cf;
+      var c = CATS[x.id];
+      return {
+        label: x.name,
+        pressed: on ? 'true' : 'false',
+        pick: function () { self.setState({ cat: x.id }); },
+        style: 'flex-shrink: 0; height: 34px; padding: 0 12px; border-radius: 17px; border: none; cursor: pointer; font-size: 13px; font-weight: ' + (on ? '700' : '500') + '; background: ' + (on ? (c ? c.fill : '#E6E2DC') : '#FFFFFF') + '; color: ' + (on ? (c ? c.text : '#3D3A36') : '#5A544C') + (on ? '' : '; box-shadow: inset 0 0 0 1px #EAE4DB')
+      };
+    });
+    return {
+      catFilters: catFilters,
+      deals: deals,
+      empty: deals.length === 0,
+      filters: filters,
+      paidMonth: money(paidMonth).replace('NT', ''),
+      unpaid: money(unpaid).replace('NT', ''),
+      paidYear: money(paidYear).replace('NT', '')
+    };
+  }
+}
+</script>
+</body>
+</html>

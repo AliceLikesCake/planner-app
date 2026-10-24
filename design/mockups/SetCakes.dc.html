@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>每日蛋糕</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Huninn&amp;family=Noto+Sans+TC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3D3A36}a:hover{color:#1F1D1B}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; display: flex; flex-direction: column; background: #FAF7F2; font-family: 'Noto Sans TC', system-ui, sans-serif; color: #3D3A36; overflow: hidden">
+  <div style="display: flex; align-items: center; gap: 4px; padding: 50px 12px 6px">
+    <a href="Settings.dc.html" aria-label="返回設定" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; text-decoration: none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3D3A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+    </a>
+    <div style="font-family: 'Huninn', 'Noto Sans TC', sans-serif; font-size: 22px">每日蛋糕</div>
+  </div>
+
+  <div style="flex: 1; overflow-y: auto; padding: 8px 16px 32px; display: flex; flex-direction: column; gap: 12px">
+    <div style="font-size: 12px; color: #6E6860; padding: 0 4px">每天完成待辦時疊的甜點，點一下可以換成別的</div>
+
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 0 14px">
+      <sc-for list="{{days}}" as="d" hint-placeholder-count="7">
+        <div style="{{d.wrap}}">
+          <button onClick="{{d.open}}" aria-expanded="{{d.expanded}}" style="width: 100%; min-height: 58px; border: none; background: transparent; padding: 0; cursor: pointer; display: flex; align-items: center; gap: 12px; text-align: left; color: #3D3A36">
+            <span style="{{d.dayBox}}">{{d.wd}}</span>
+            <span style="flex: 1; min-width: 0; font-size: 15px; font-weight: 500">{{d.name}}</span>
+            <span style="font-size: 13px; color: #6E6860">更換</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A8A198" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{d.chev}}"/></svg>
+          </button>
+          <sc-if value="{{d.isOpen}}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; gap: 6px; flex-wrap: wrap; padding: 0 0 14px">
+              <sc-for list="{{d.opts}}" as="o" hint-placeholder-count="10">
+                <button onClick="{{o.pick}}" aria-pressed="{{o.pressed}}" style="{{o.style}}">{{o.name}}</button>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 0 16px">
+      <sc-for list="{{toggles}}" as="t" hint-placeholder-count="3">
+        <div style="{{t.wrap}}">
+          <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+            <span style="font-size: 15px">{{t.label}}</span>
+            <span style="font-size: 12px; color: #6E6860">{{t.sub}}</span>
+          </div>
+          <button onClick="{{t.flip}}" role="switch" aria-checked="{{t.aria}}" aria-label="{{t.label}}" style="{{t.track}}">
+            <span style="width: 26px; height: 26px; border-radius: 13px; background: #FFFFFF"></span>
+          </button>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline">
+        <span style="font-size: 15px">一天最多疊幾層</span>
+        <span style="font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums">{{maxText}}</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">
+        <sc-for list="{{maxOpts}}" as="m" hint-placeholder-count="4">
+          <button onClick="{{m.pick}}" aria-pressed="{{m.pressed}}" style="{{m.style}}">{{m.label}}</button>
+        </sc-for>
+      </div>
+      <span style="font-size: 12px; color: #6E6860">超過的待辦會把同類別合併成一層，蛋糕不會疊得太高</span>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      pick: ['草莓鮮奶油蛋糕', '千層蛋糕', '杯子蛋糕', '冰淇淋聖代', '焦糖布丁', '鬆餅塔', '三層派對蛋糕'],
+      open: null, random: false, glitter: true, keep: true, max: 8
+    };
+  }
+  renderVals() {
+    var self = this;
+    var st = this.state;
+    var wk = ['一', '二', '三', '四', '五', '六', '日'];
+    var all = ['草莓鮮奶油蛋糕', '千層蛋糕', '杯子蛋糕', '冰淇淋聖代', '焦糖布丁', '鬆餅塔', '三層派對蛋糕', '提拉米蘇', '草莓塔', '生乳捲'];
+    function track(on) { return 'width: 52px; height: 32px; border-radius: 16px; border: none; padding: 3px; cursor: pointer; flex-shrink: 0; display: flex; justify-content: ' + (on ? 'flex-end' : 'flex-start') + '; background: ' + (on ? '#8DB58F' : '#D9D2C7'); }
+    function chip(on) { return 'height: 36px; padding: 0 12px; border-radius: 18px; border: none; cursor: pointer; font-size: 13px; font-weight: ' + (on ? '700' : '500') + '; background: ' + (on ? '#3D3A36' : '#F5F1EA') + '; color: ' + (on ? '#FFFFFF' : '#5A544C'); }
+    var tg = [
+      { key: 'random', label: '每週隨機換甜點', sub: '每週一自動抽七種不同的甜點' },
+      { key: 'glitter', label: '全部完成時的閃亮音效', sub: '使用 Fairy glitter' },
+      { key: 'keep', label: '把完成的蛋糕收進月曆', sub: '之後可以回顧每天吃了什麼' }
+    ];
+    return {
+      days: st.pick.map(function (name, i) {
+        var isOpen = st.open === i;
+        var today = i === 4;
+        return {
+          wd: wk[i], name: name, isOpen: isOpen, expanded: isOpen ? 'true' : 'false',
+          chev: isOpen ? 'M5 9l7 7 7-7' : 'M9 5l7 7-7 7',
+          open: function () { self.setState({ open: self.state.open === i ? null : i }); },
+          wrap: i < 6 ? 'border-bottom: 1px solid #F3EEE7' : '',
+          dayBox: 'width: 36px; height: 36px; border-radius: 12px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; ' + (today ? 'background: #3D3A36; color: #FFFFFF' : 'background: #F5F1EA; color: #3D3A36'),
+          opts: all.map(function (n) {
+            var on = n === name;
+            return { name: n, pressed: on ? 'true' : 'false', style: chip(on), pick: function () { var nx = self.state.pick.slice(); nx[i] = n; self.setState({ pick: nx, open: null }); } };
+          })
+        };
+      }),
+      toggles: tg.map(function (t, i) {
+        var on = !!st[t.key];
+        return {
+          label: t.label, sub: t.sub, aria: on ? 'true' : 'false', track: track(on),
+          wrap: 'display: flex; align-items: center; gap: 12px; min-height: 64px' + (i < tg.length - 1 ? '; border-bottom: 1px solid #F3EEE7' : ''),
+          flip: function () { var p = {}; p[t.key] = !self.state[t.key]; self.setState(p); }
+        };
+      }),
+      maxText: st.max + ' 層',
+      maxOpts: [6, 8, 10, 12].map(function (n) {
+        var on = n === st.max;
+        return { label: n + ' 層', pressed: on ? 'true' : 'false', style: chip(on) + '; padding: 0', pick: function () { self.setState({ max: n }); } };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>新增習慣</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Huninn&amp;family=Noto+Sans+TC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3D3A36}a:hover{color:#1F1D1B}
+button,input{font-family:inherit}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; display: flex; flex-direction: column; background: #FAF7F2; font-family: 'Noto Sans TC', system-ui, sans-serif; color: #3D3A36; overflow: hidden">
+  <div style="display: flex; justify-content: space-between; align-items: center; padding: 50px 12px 6px">
+    <a href="Goals.dc.html" style="height: 44px; padding: 0 12px; display: flex; align-items: center; font-size: 15px; color: #6E6860; text-decoration: none">取消</a>
+    <div style="font-family: 'Huninn', 'Noto Sans TC', sans-serif; font-size: 19px">新增習慣</div>
+    <a href="Goals.dc.html" style="height: 40px; padding: 0 16px; border-radius: 20px; background: #3D3A36; color: #FFFFFF; display: flex; align-items: center; font-size: 14px; font-weight: 700; text-decoration: none">儲存</a>
+  </div>
+
+  <div style="flex: 1; overflow-y: auto; padding: 8px 16px 32px; display: flex; flex-direction: column; gap: 14px">
+    <div style="display: flex; justify-content: center; padding: 6px 0">
+      <div style="{{preview}}">
+        <span style="position: absolute; top: 14%; left: 20%; width: 22%; height: 14%; border-radius: 50%; background: rgba(255,255,255,0.75); transform: rotate(-30deg)"></span>
+        <span style="{{pvName}}">伸展</span>
+        <span style="{{pvSub}}">每天 15 分鐘</span>
+      </div>
+    </div>
+
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 4px 16px">
+      <div style="display: flex; flex-direction: column; gap: 4px; padding: 12px 0; border-bottom: 1px solid #F3EEE7">
+        <label for="h-name" style="font-size: 12px; font-weight: 700; color: #6E6860">習慣名稱</label>
+        <input id="h-name" type="text" value="伸展" style="border: none; outline: none; font-size: 18px; font-weight: 700; color: #3D3A36; padding: 2px 0; background: transparent">
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px; padding: 12px 0">
+        <label for="h-goal" style="font-size: 12px; font-weight: 700; color: #6E6860">目標（會寫在泡泡上）</label>
+        <input id="h-goal" type="text" value="每天 15 分鐘" style="border: none; outline: none; font-size: 15px; color: #3D3A36; padding: 2px 0; background: transparent">
+      </div>
+    </div>
+
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+      <div style="font-size: 15px">泡泡顏色</div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap">
+        <sc-for list="{{colors}}" as="c" hint-placeholder-count="7">
+          <button onClick="{{c.pick}}" aria-label="{{c.label}}" aria-pressed="{{c.pressed}}" style="{{c.style}}">
+            <sc-if value="{{c.on}}" hint-placeholder-val="{{ false }}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3D3A36" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>
+            </sc-if>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline">
+        <span style="font-size: 15px">哪幾天要做</span>
+        <span style="font-size: 12px; color: #6E6860">{{dayHint}}</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px">
+        <sc-for list="{{days}}" as="d" hint-placeholder-count="7">
+          <button onClick="{{d.pick}}" aria-pressed="{{d.pressed}}" aria-label="{{d.aria}}" style="{{d.style}}">{{d.label}}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 4px 16px">
+      <div style="display: flex; justify-content: space-between; align-items: center; min-height: 60px; gap: 12px">
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <span style="font-size: 15px">每日提醒</span>
+          <span style="font-size: 12px; color: #6E6860">還沒戳破時，21:30 提醒我</span>
+        </div>
+        <button onClick="{{flipRemind}}" role="switch" aria-checked="{{remindAria}}" aria-label="每日提醒" style="{{remindTrack}}">
+          <span style="width: 26px; height: 26px; border-radius: 13px; background: #FFFFFF"></span>
+        </button>
+      </div>
+    </div>
+
+    <div style="background: #F1ECE4; border-radius: 18px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px">
+      <div style="font-size: 12px; font-weight: 700; color: #5A544C">儲存後會同步到</div>
+      <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #5A544C">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>
+        <span>習慣頁多一顆泡泡，選的那幾天才會出現</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #5A544C">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>
+        <span>每月紀錄多一個分頁，記錄連續天數</span>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { color: 'rose', days: [true, true, true, true, true, true, true], remind: true };
+  }
+  renderVals() {
+    var self = this;
+    var st = this.state;
+    var palette = [
+      { id: 'blue', fill: '#DCE8F5', text: '#3E5F8F', deep: '#7FA3CF', name: '霧藍' },
+      { id: 'lav', fill: '#E8E0F3', text: '#65508F', deep: '#A891CC', name: '薰衣草' },
+      { id: 'green', fill: '#DDEBDD', text: '#3D6442', deep: '#8DB58F', name: '鼠尾草' },
+      { id: 'peach', fill: '#F8E1D4', text: '#8A4A2B', deep: '#E0A07F', name: '蜜桃' },
+      { id: 'butter', fill: '#F6EBC8', text: '#7F6224', deep: '#D9BC6E', name: '奶油黃' },
+      { id: 'rose', fill: '#F5DADA', text: '#8E3F3F', deep: '#DE9C9C', name: '乾燥玫瑰' },
+      { id: 'mint', fill: '#D6EEE8', text: '#36705F', deep: '#7DBFB0', name: '薄荷' }
+    ];
+    var c = palette.filter(function (p) { return p.id === st.color; })[0];
+    var wk = ['一', '二', '三', '四', '五', '六', '日'];
+    var cnt = st.days.filter(Boolean).length;
+    var on = st.remind;
+    return {
+      preview: 'position: relative; width: 130px; height: 130px; border-radius: 50%; padding: 12px; box-sizing: border-box; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; background: ' + c.fill + '; border: 2px solid ' + c.deep + '; box-shadow: inset -8px -10px 0 rgba(255,255,255,0.35); animation: float 4s ease-in-out infinite; transition: background 200ms ease',
+      pvName: "font-family: 'Huninn', 'Noto Sans TC', sans-serif; font-size: 18px; color: " + c.text,
+      pvSub: 'font-size: 12px; font-weight: 700; color: ' + c.text,
+      colors: palette.map(function (p) {
+        var sel = p.id === st.color;
+        return {
+          on: sel, pressed: sel ? 'true' : 'false', label: p.name,
+          pick: function () { self.setState({ color: p.id }); },
+          style: 'width: 40px; height: 40px; border-radius: 50%; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; background: ' + p.fill + '; border: 3px solid ' + (sel ? '#3D3A36' : p.deep)
+        };
+      }),
+      days: st.days.map(function (v, i) {
+        return {
+          label: wk[i], pressed: v ? 'true' : 'false', aria: '星期' + wk[i],
+          pick: function () { var nx = self.state.days.slice(); nx[i] = !nx[i]; self.setState({ days: nx }); },
+          style: 'height: 40px; border-radius: 12px; border: none; cursor: pointer; font-size: 14px; font-weight: 700; padding: 0; background: ' + (v ? c.fill : '#F5F1EA') + '; color: ' + (v ? c.text : '#A8A198') + (v ? '; box-shadow: inset 0 0 0 1.5px ' + c.deep : '')
+        };
+      }),
+      dayHint: cnt === 7 ? '每天' : '每週 ' + cnt + ' 天',
+      remindAria: on ? 'true' : 'false',
+      remindTrack: 'width: 52px; height: 32px; border-radius: 16px; border: none; padding: 3px; cursor: pointer; flex-shrink: 0; display: flex; justify-content: ' + (on ? 'flex-end' : 'flex-start') + '; background: ' + (on ? '#8DB58F' : '#D9D2C7'),
+      flipRemind: function () { self.setState({ remind: !self.state.remind }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

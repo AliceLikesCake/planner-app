@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>月曆</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Huninn&amp;family=Noto+Sans+TC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3D3A36}a:hover{color:#1F1D1B}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; display: flex; flex-direction: column; background: #FAF7F2; font-family: 'Noto Sans TC', system-ui, sans-serif; color: #3D3A36; overflow: hidden">
+  <div style="flex: 1; overflow-y: auto; padding: 50px 12px 110px; display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 6px">
+      <div style="font-family: 'Huninn', 'Noto Sans TC', sans-serif; font-size: 26px">2026年10月</div>
+      <div style="display: flex; gap: 6px">
+        <button aria-label="上個月" style="width: 44px; height: 44px; border-radius: 22px; border: none; background: #F1ECE4; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3D3A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <button aria-label="下個月" style="width: 44px; height: 44px; border-radius: 22px; border: none; background: #F1ECE4; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3D3A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 6px; overflow-x: auto; padding: 0 2px">
+      <sc-for list="{{filters}}" as="fi" hint-placeholder-count="7">
+        <button onClick="{{fi.pick}}" aria-pressed="{{fi.pressed}}" style="{{fi.style}}">
+          <span style="{{fi.dot}}"></span>{{fi.label}}
+        </button>
+      </sc-for>
+    </div>
+
+    <div style="background: #FFFFFF; border-radius: 22px; padding: 8px 4px 4px; display: flex; flex-direction: column">
+      <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); text-align: center; font-size: 12px; color: #6E6860; padding-bottom: 6px">
+        <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr))">
+        <sc-for list="{{cells}}" as="cell" hint-placeholder-count="35">
+          <div style="{{cell.wrap}}">
+            <sc-if value="{{cell.real}}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{cell.pick}}" aria-label="{{cell.aria}}" aria-pressed="{{cell.pressed}}" style="{{cell.style}}">
+                <span style="{{cell.numStyle}}">{{cell.day}}</span>
+                <sc-for list="{{cell.chips}}" as="ch" hint-placeholder-count="2">
+                  <span style="{{ch.style}}">{{ch.text}}</span>
+                </sc-for>
+                <sc-if value="{{cell.hasMore}}" hint-placeholder-val="{{ false }}">
+                  <span style="font-size: 10px; font-weight: 700; color: #6E6860; padding-left: 3px">{{cell.more}}</span>
+                </sc-if>
+              </button>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="background: #FFFFFF; border-radius: 22px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline">
+        <div style="font-family: 'Huninn', 'Noto Sans TC', sans-serif; font-size: 19px">{{selLabel}}</div>
+        <div style="font-size: 13px; color: #6E6860">{{selCount}}</div>
+      </div>
+      <sc-for list="{{events}}" as="ev" hint-placeholder-count="3">
+        <div style="display: flex; align-items: stretch; gap: 12px; min-height: 46px">
+          <span style="{{ev.bar}}"></span>
+          <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 2px">
+            <span style="font-size: 15px; font-weight: 500">{{ev.title}}</span>
+            <span style="font-size: 12px; color: #6E6860">{{ev.meta}}</span>
+          </div>
+          <span style="{{ev.chip}}">{{ev.cat}}</span>
+        </div>
+      </sc-for>
+      <sc-if value="{{noEvents}}" hint-placeholder-val="{{ false }}">
+        <div style="font-size: 14px; color: #6E6860; padding: 6px 0">這天沒有安排</div>
+      </sc-if>
+    </div>
+
+    <div style="background: #FFFFFF; border-radius: 22px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline">
+        <div style="font-family: 'Huninn', 'Noto Sans TC', sans-serif; font-size: 19px">待辦事項</div>
+        <div style="font-size: 13px; color: #6E6860; font-variant-numeric: tabular-nums">{{doneCount}}</div>
+      </div>
+      <sc-if value="{{hasTodos}}" hint-placeholder-val="{{ true }}">
+        <div style="height: 8px; border-radius: 4px; background: #F3EEE6; overflow: hidden">
+          <div style="{{todoBar}}"></div>
+        </div>
+      </sc-if>
+      <sc-for list="{{doneList}}" as="dn" hint-placeholder-count="4">
+        <div style="display: flex; align-items: center; gap: 12px; min-height: 42px">
+          <span style="{{dn.check}}">
+            <sc-if value="{{dn.done}}" hint-placeholder-val="{{ false }}">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>
+            </sc-if>
+          </span>
+          <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+            <span style="{{dn.titleStyle}}">{{dn.title}}</span>
+            <span style="{{dn.metaStyle}}">{{dn.time}}</span>
+          </div>
+          <span style="{{dn.chip}}">{{dn.cat}}</span>
+        </div>
+      </sc-for>
+      <sc-if value="{{doneEmpty}}" hint-placeholder-val="{{ false }}">
+        <div style="font-size: 14px; color: #6E6860; padding: 6px 0">{{doneEmptyText}}</div>
+      </sc-if>
+    </div>
+  </div>
+
+  <a href="AddEvent.dc.html" aria-label="新增行程" style="position: absolute; right: 20px; bottom: 100px; width: 56px; height: 56px; border-radius: 28px; background: #3D3A36; display: flex; align-items: center; justify-content: center; z-index: 5">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+  </a>
+
+  <nav style="height: 84px; flex-shrink: 0; background: #FFFFFF; border-radius: 28px 28px 0 0; box-shadow: 0 -4px 20px rgba(61,58,54,0.06); display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 8px 6px 14px; box-sizing: border-box; position: relative; z-index: 4">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; color: #6E6860; font-size: 11px; font-weight: 500">
+      <span style="width: 52px; height: 32px; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16M5 20v-6h14v6M7 14v-4h10v4M12 10V7"/><path d="M12 4.5c.8.6.8 1.6 0 2"/></svg></span>
+      <span>今日</span>
+    </a>
+    <a href="Calendar.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; color: #3D3A36; font-size: 11px; font-weight: 700">
+      <span style="width: 52px; height: 32px; border-radius: 16px; background: #F1ECE4; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="4"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></span>
+      <span>月曆</span>
+    </a>
+    <a href="Goals.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; color: #6E6860; font-size: 11px; font-weight: 500">
+      <span style="width: 52px; height: 32px; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></span>
+      <span>習慣</span>
+    </a>
+    <a href="Collabs.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; color: #6E6860; font-size: 11px; font-weight: 500">
+      <span style="width: 52px; height: 32px; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12.5V4.5h8l9 9-8 8z"/><circle cx="8" cy="9" r="1.5"/></svg></span>
+      <span>接案</span>
+    </a>
+    <a href="Money.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; color: #6E6860; font-size: 11px; font-weight: 500">
+      <span style="width: 52px; height: 32px; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="4"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1.2"/></svg></span>
+      <span>記帳</span>
+    </a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { sel: 22, filter: 'all' };
+  }
+  renderVals() {
+    var self = this;
+    var cats = {
+      work: { name: '工作', fill: '#DCE8F5', text: '#3E5F8F', bar: '#7FA3CF' },
+      collab: { name: '接案', fill: '#E8E0F3', text: '#65508F', bar: '#A891CC' },
+      date: { name: '約會聚餐', fill: '#F6EBC8', text: '#7F6224', bar: '#D9BC6E' },
+      travel: { name: '旅行', fill: '#D6EEE8', text: '#36705F', bar: '#7DBFB0' },
+      study: { name: '學習', fill: '#DDEBDD', text: '#3D6442', bar: '#8DB58F' },
+      health: { name: '健康', fill: '#F5DADA', text: '#8E3F3F', bar: '#DE9C9C' }
+    };
+    // start/end day, short label for the calendar cell, full title, time, category
+    var E = function (s, e, c, short, title, time) { return { s: s, e: e, c: c, short: short, title: title, time: time }; };
+    var events = [
+      E(2, 2, 'study', '英文課', '英文會話課', '18:30'),
+      E(5, 5, 'work', '週會', '部門週會', '09:30'),
+      E(8, 8, 'collab', 'C 拍攝', '品牌 C 拍攝', '14:00'),
+      E(10, 10, 'date', '朋友聚餐', '和大學朋友聚餐', '18:00'),
+      E(12, 12, 'health', '牙醫', '牙醫回診', '19:00'),
+      E(13, 13, 'collab', 'C 交稿', '品牌 C 交付貼文草稿', '23:59 前'),
+      E(15, 15, 'collab', 'B 上線', '品牌 B Reels 上線', '20:00'),
+      E(16, 16, 'study', '英文課', '英文會話課', '18:30'),
+      E(17, 17, 'date', '生日聚會', '小美生日聚會', '19:00'),
+      E(20, 20, 'collab', 'C 入帳', '品牌 C 款項入帳 NT$5,000', '整天'),
+      E(22, 22, 'collab', 'A 送審', '品牌 A 草稿送審', '12:30'),
+      E(22, 22, 'work', '需求會議', '電子表單需求會議', '10:00'),
+      E(23, 23, 'study', '英文課', '英文會話課', '18:30'),
+      E(24, 24, 'date', '看電影', '週末約會看電影', '15:00'),
+      E(25, 25, 'collab', 'A 上線', '品牌 A 貼文上線', '12:00'),
+      E(27, 27, 'collab', 'D 交稿', '品牌 D 交付限動素材', '18:00 前'),
+      E(28, 31, 'travel', '東京旅行', '東京旅行（10/28 – 11/01）', '桃園機場 08:40 起飛'),
+      E(30, 30, 'work', '月報', '提交月報', '17:00')
+    ];
+    var f = this.state.filter;
+    var shown = events.filter(function (e) { return f === 'all' || e.c === f; });
+    var lead = 4;
+    var wkNames = ['日', '一', '二', '三', '四', '五', '六'];
+
+    var cells = [];
+    for (var b = 0; b < lead; b++) cells.push({ real: false, wrap: 'min-height: 78px; border-top: 1px solid #F1ECE4' });
+    for (var d = 1; d <= 31; d++) {
+      (function (day) {
+        var col = (lead + day - 1) % 7;
+        var list = shown.filter(function (e) { return day >= e.s && day <= e.e; });
+        list.sort(function (x, y) { return (y.e - y.s) - (x.e - x.s); });
+        var maxChips = 3;
+        var chips = list.slice(0, maxChips).map(function (e) {
+          var c = cats[e.c];
+          var multi = e.e > e.s;
+          var isStart = day === e.s;
+          var isEnd = day === e.e;
+          var showText = !multi || isStart || col === 0;
+          var rl = (!multi || isStart || col === 0) ? '5px' : '0';
+          var rr = (!multi || isEnd || col === 6) ? '5px' : '0';
+          var ml = multi && !isStart && col !== 0 ? '-1px' : '2px';
+          var mr = multi && !isEnd && col !== 6 ? '-1px' : '2px';
+          return {
+            text: showText ? e.short : ' ',
+            style: 'display: block; height: 16px; line-height: 16px; font-size: 10px; font-weight: 700; padding: 0 3px; white-space: nowrap; overflow: hidden; text-overflow: clip; text-align: left; margin: 0 ' + mr + ' 0 ' + ml + '; border-radius: ' + rl + ' ' + rr + ' ' + rr + ' ' + rl + '; background: ' + c.fill + '; color: ' + c.text
+          };
+        });
+        var isSel = self.state.sel === day;
+        var isToday = day === 22;
+        var weekend = col === 0 || col === 6;
+        cells.push({
+          real: true,
+          day: day,
+          wrap: 'min-height: 78px; border-top: 1px solid #F1ECE4; display: flex',
+          pressed: isSel ? 'true' : 'false',
+          aria: '10月' + day + '日，' + (list.length ? list.map(function (e) { return e.title; }).join('、') : '沒有安排'),
+          style: 'flex: 1; min-width: 0; border: none; cursor: pointer; padding: 3px 0 4px; display: flex; flex-direction: column; align-items: stretch; gap: 2px; border-radius: 10px; background: ' + (isSel ? '#F5F1EA' : 'transparent'),
+          numStyle: 'align-self: center; width: 22px; height: 22px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-variant-numeric: tabular-nums; font-weight: ' + (isToday || isSel ? '700' : '500') + '; background: ' + (isToday ? '#3D3A36' : 'transparent') + '; color: ' + (isToday ? '#FFFFFF' : (weekend ? '#A0605A' : '#3D3A36')),
+          chips: chips,
+          hasMore: list.length > maxChips,
+          more: '+' + (list.length - maxChips),
+          pick: function () { self.setState({ sel: day }); }
+        });
+      })(d);
+    }
+    var tail = (7 - (cells.length % 7)) % 7;
+    for (var tt = 0; tt < tail; tt++) cells.push({ real: false, wrap: 'min-height: 78px; border-top: 1px solid #F1ECE4' });
+
+    var filterDefs = [{ id: 'all', label: '全部' }].concat(Object.keys(cats).map(function (k) { return { id: k, label: cats[k].name }; }));
+    var filters = filterDefs.map(function (x) {
+      var on = x.id === f;
+      var c = cats[x.id];
+      return {
+        label: x.label,
+        pressed: on ? 'true' : 'false',
+        pick: function () { self.setState({ filter: x.id }); },
+        dot: c ? 'width: 8px; height: 8px; border-radius: 4px; background: ' + c.bar : 'display: none',
+        style: 'flex-shrink: 0; height: 36px; padding: 0 12px; border-radius: 18px; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: ' + (on ? '700' : '500') + '; background: ' + (on ? '#3D3A36' : '#FFFFFF') + '; color: ' + (on ? '#FFFFFF' : '#5A544C')
+      };
+    });
+
+    var sel = this.state.sel;
+    var selEvents = shown.filter(function (e) { return sel >= e.s && sel <= e.e; }).map(function (e) {
+      var c = cats[e.c];
+      var span = e.e > e.s ? '第 ' + (sel - e.s + 1) + ' 天 · ' : '';
+      return {
+        title: e.title,
+        meta: span + e.time,
+        cat: c.name,
+        bar: 'width: 4px; border-radius: 2px; flex-shrink: 0; background: ' + c.bar,
+        chip: 'align-self: center; flex-shrink: 0; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 10px; background: ' + c.fill + '; color: ' + c.text
+      };
+    });
+    var wd = (lead + sel - 1) % 7;
+
+    var tc = {
+      '工作': ['#DCE8F5', '#3E5F8F'], '接案': ['#E8E0F3', '#65508F'],
+      '學習': ['#DDEBDD', '#3D6442'], '生活': ['#F6EBC8', '#7F6224'], '健康': ['#F5DADA', '#8E3F3F']
+    };
+    var pool = [
+      ['確認表單需求', '工作'], ['回覆主管信件', '工作'], ['測試表單流程', '工作'],
+      ['整理接案照片', '接案'], ['回覆品牌訊息', '接案'],
+      ['整理接案作品集', '接案'], ['背日文單字 30 分鐘', '學習'], ['英文課預習', '學習'],
+      ['伸展 15 分鐘', '健康'], ['喝水 2000cc', '健康'], ['記帳', '生活'], ['洗衣服', '生活']
+    ];
+    var times = ['09:00', '10:30', '12:30', '14:00', '18:30', '20:00', '21:30', '22:00'];
+    var raw = [];
+    if (sel === 22) {
+      raw = [
+        { title: '確認電子表單需求', cat: '工作', time: '08:30', done: true },
+        { title: '品牌 A 貼文草稿送審', cat: '接案', time: '12:30', done: false },
+        { title: '整理接案作品集', cat: '接案', time: '18:30', done: false },
+        { title: '背日文單字 30 分鐘', cat: '學習', time: '20:00', done: true },
+        { title: '伸展 15 分鐘', cat: '健康', time: '21:30', done: false },
+        { title: '記帳：午餐、交通', cat: '生活', time: '22:00', done: false }
+      ];
+    } else {
+      var cnt = 3 + ((sel * 7) % 4);
+      for (var di = 0; di < cnt; di++) {
+        var p = pool[(sel * 5 + di * 3) % pool.length];
+        var isDone = sel < 22 && ((sel + di) % 5 !== 0);
+        raw.push({ title: p[0], cat: p[1], time: times[(di * 2 + sel) % times.length], done: isDone });
+      }
+      raw.sort(function (x, y) { return x.time < y.time ? -1 : 1; });
+    }
+    raw.sort(function (x, y) { return (x.done === y.done) ? 0 : (x.done ? 1 : -1); });
+    var doneN = raw.filter(function (r) { return r.done; }).length;
+    var doneList = raw.map(function (r) {
+      var c = tc[r.cat];
+      return {
+        title: r.title, cat: r.cat, done: r.done,
+        time: r.time + (r.done ? ' · 已完成' : (sel < 22 ? ' · 未完成' : '')),
+        check: 'width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; box-sizing: border-box; display: flex; align-items: center; justify-content: center; ' + (r.done ? 'background: #A8A198' : 'background: #FFFFFF; border: 2px solid ' + c[1]),
+        titleStyle: 'font-size: 15px; font-weight: 500; ' + (r.done ? 'color: #8C857B; text-decoration: line-through' : 'color: #3D3A36'),
+        metaStyle: 'font-size: 12px; ' + (!r.done && sel < 22 ? 'color: #A0605A; font-weight: 700' : 'color: #6E6860'),
+        chip: 'flex-shrink: 0; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 10px; background: ' + (r.done ? '#E6E2DC' : c[0]) + '; color: ' + (r.done ? '#6E6860' : c[1])
+      };
+    });
+    var important = events.filter(function (e) { return e.s > 22 && (e.c === 'collab' || e.c === 'travel' || e.c === 'date'); }).slice(0, 4);
+    var upcoming = important.map(function (e) {
+      var c = cats[e.c];
+      var diff = e.s - 22;
+      return {
+        mon: '10月', d: e.s, title: e.title, cat: c.name,
+        left: diff === 1 ? '明天' : '還有 ' + diff + ' 天',
+        dateBox: 'width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; background: ' + c.fill + '; color: ' + c.text,
+        chip: 'flex-shrink: 0; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 10px; background: ' + c.fill + '; color: ' + c.text
+      };
+    });
+
+    return {
+      filters: filters,
+      cells: cells,
+      selLabel: '10月' + sel + '日（' + wkNames[wd] + '）',
+      selCount: selEvents.length ? selEvents.length + ' 個行程' : '',
+      events: selEvents,
+      noEvents: selEvents.length === 0,
+      doneList: doneList,
+      doneCount: raw.length ? '完成 ' + doneN + ' / ' + raw.length : '',
+      hasTodos: raw.length > 0,
+      todoBar: 'height: 100%; border-radius: 4px; background: #8DB58F; width: ' + (raw.length ? Math.round(doneN / raw.length * 100) : 0) + '%',
+      doneEmpty: raw.length === 0,
+      doneEmptyText: '這天沒有待辦事項'
+    };
+  }
+}
+</script>
+</body>
+</html>

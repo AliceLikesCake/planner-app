@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>新增行程</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Huninn&amp;family=Noto+Sans+TC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3D3A36}a:hover{color:#1F1D1B}
+button,input,textarea{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; display: flex; flex-direction: column; background: #FAF7F2; font-family: 'Noto Sans TC', system-ui, sans-serif; color: #3D3A36; overflow: hidden">
+  <div style="display: flex; justify-content: space-between; align-items: center; padding: 50px 12px 6px">
+    <a href="Calendar.dc.html" style="height: 44px; padding: 0 12px; display: flex; align-items: center; font-size: 15px; color: #6E6860; text-decoration: none">取消</a>
+    <div style="font-family: 'Huninn', 'Noto Sans TC', sans-serif; font-size: 19px">新增行程</div>
+    <a href="Calendar.dc.html" style="height: 40px; padding: 0 16px; border-radius: 20px; background: #3D3A36; color: #FFFFFF; display: flex; align-items: center; font-size: 14px; font-weight: 700; text-decoration: none">儲存</a>
+  </div>
+
+  <div style="flex: 1; overflow-y: auto; padding: 8px 16px 32px; display: flex; flex-direction: column; gap: 14px">
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
+      <label for="e-title" style="font-size: 12px; font-weight: 700; color: #6E6860">行程名稱</label>
+      <input id="e-title" type="text" value="東京旅行" style="border: none; outline: none; font-size: 18px; font-weight: 700; color: #3D3A36; padding: 4px 0; background: transparent">
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="font-size: 14px; font-weight: 700; padding: 0 4px">類別</div>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+        <sc-for list="{{cats}}" as="c" hint-placeholder-count="6">
+          <button onClick="{{c.pick}}" aria-pressed="{{c.pressed}}" style="{{c.style}}">
+            <span style="{{c.dot}}"></span>{{c.name}}
+          </button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 4px 16px">
+      <div style="display: flex; justify-content: space-between; align-items: center; min-height: 56px; border-bottom: 1px solid #F3EEE7; gap: 12px">
+        <span style="font-size: 15px">整天</span>
+        <button onClick="{{flipAllDay}}" role="switch" aria-checked="{{allDayAria}}" aria-label="整天" style="{{allDayTrack}}">
+          <span style="width: 26px; height: 26px; border-radius: 13px; background: #FFFFFF"></span>
+        </button>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; min-height: 52px; border-bottom: 1px solid #F3EEE7">
+        <label for="e-start" style="font-size: 15px">開始</label>
+        <input id="e-start" type="text" value="{{startText}}" style="border: none; outline: none; text-align: right; font-size: 15px; font-weight: 700; color: #3D3A36; background: transparent; width: 180px">
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; min-height: 52px; border-bottom: 1px solid #F3EEE7">
+        <label for="e-end" style="font-size: 15px">結束</label>
+        <input id="e-end" type="text" value="{{endText}}" style="border: none; outline: none; text-align: right; font-size: 15px; font-weight: 700; color: #3D3A36; background: transparent; width: 180px">
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; min-height: 52px">
+        <label for="e-place" style="font-size: 15px">地點（選填）</label>
+        <input id="e-place" type="text" value="桃園機場 第二航廈" style="border: none; outline: none; text-align: right; font-size: 15px; color: #3D3A36; background: transparent; width: 180px">
+      </div>
+    </div>
+
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 12px 16px 14px; display: flex; flex-direction: column; gap: 10px">
+      <div style="font-size: 15px">提醒</div>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">
+        <sc-for list="{{reminds}}" as="r" hint-placeholder-count="4">
+          <button onClick="{{r.pick}}" aria-pressed="{{r.pressed}}" style="{{r.style}}">{{r.label}}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 4px 16px">
+      <div style="display: flex; justify-content: space-between; align-items: center; min-height: 64px; gap: 12px">
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <span style="font-size: 15px">同時加到今日待辦</span>
+          <span style="font-size: 12px; color: #6E6860">行程當天會出現在待辦清單，可以打勾疊蛋糕</span>
+        </div>
+        <button onClick="{{flipTodo}}" role="switch" aria-checked="{{todoAria}}" aria-label="同時加到今日待辦" style="{{todoTrack}}">
+          <span style="width: 26px; height: 26px; border-radius: 13px; background: #FFFFFF"></span>
+        </button>
+      </div>
+    </div>
+
+    <div style="background: #F1ECE4; border-radius: 18px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px">
+      <div style="font-size: 12px; font-weight: 700; color: #5A544C">儲存後會同步到</div>
+      <sc-for list="{{syncs}}" as="sy" hint-placeholder-count="2">
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #5A544C">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>
+          <span>{{sy.t}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { cat: 'travel', allDay: true, remind: 'day', todo: false };
+  }
+  renderVals() {
+    var self = this;
+    var st = this.state;
+    var cats = [
+      { id: 'work', name: '工作', fill: '#DCE8F5', text: '#3E5F8F', deep: '#7FA3CF' },
+      { id: 'collab', name: '接案', fill: '#E8E0F3', text: '#65508F', deep: '#A891CC' },
+      { id: 'date', name: '約會聚餐', fill: '#F6EBC8', text: '#7F6224', deep: '#D9BC6E' },
+      { id: 'travel', name: '旅行', fill: '#D6EEE8', text: '#36705F', deep: '#7DBFB0' },
+      { id: 'study', name: '學習', fill: '#DDEBDD', text: '#3D6442', deep: '#8DB58F' },
+      { id: 'health', name: '健康', fill: '#F5DADA', text: '#8E3F3F', deep: '#DE9C9C' }
+    ];
+    function chip(on) {
+      return 'height: 38px; padding: 0; border-radius: 19px; border: none; cursor: pointer; font-size: 13px; font-weight: ' + (on ? '700' : '500') + '; background: ' + (on ? '#3D3A36' : '#F5F1EA') + '; color: ' + (on ? '#FFFFFF' : '#5A544C');
+    }
+    function track(on) { return 'width: 52px; height: 32px; border-radius: 16px; border: none; padding: 3px; cursor: pointer; flex-shrink: 0; display: flex; justify-content: ' + (on ? 'flex-end' : 'flex-start') + '; background: ' + (on ? '#8DB58F' : '#D9D2C7'); }
+    var remindDefs = [{ id: 'none', label: '不提醒' }, { id: 'hour', label: '1 小時前' }, { id: 'day', label: '前一天' }, { id: 'week', label: '一週前' }];
+    var remindLabel = remindDefs.filter(function (r) { return r.id === st.remind; })[0].label;
+    var cur = cats.filter(function (c) { return c.id === st.cat; })[0];
+    var syncs = [{ t: '月曆 10/28 – 11/01 會畫成一條' + cur.name + '長條' }];
+    if (st.remind !== 'none') syncs.push({ t: remindLabel + '推播提醒' });
+    if (st.todo) syncs.push({ t: '每一天的今日待辦都會出現「' + '東京旅行' + '」' });
+    return {
+      cats: cats.map(function (c) {
+        var on = c.id === st.cat;
+        return {
+          name: c.name, pressed: on ? 'true' : 'false',
+          pick: function () { self.setState({ cat: c.id }); },
+          dot: 'width: 10px; height: 10px; border-radius: 50%; background: ' + c.deep,
+          style: 'height: 44px; border-radius: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; border: 2px solid ' + (on ? c.deep : 'transparent') + '; background: ' + (on ? c.fill : '#FFFFFF') + '; color: ' + (on ? c.text : '#5A544C') + '; font-weight: ' + (on ? '700' : '500')
+        };
+      }),
+      startText: st.allDay ? '10月28日（三）' : '10月28日（三）08:40',
+      endText: st.allDay ? '11月1日（日）' : '11月1日（日）18:00',
+      allDayAria: st.allDay ? 'true' : 'false',
+      allDayTrack: track(st.allDay),
+      flipAllDay: function () { self.setState({ allDay: !self.state.allDay }); },
+      todoAria: st.todo ? 'true' : 'false',
+      todoTrack: track(st.todo),
+      flipTodo: function () { self.setState({ todo: !self.state.todo }); },
+      reminds: remindDefs.map(function (r) {
+        var on = r.id === st.remind;
+        return { label: r.label, pressed: on ? 'true' : 'false', style: chip(on), pick: function () { self.setState({ remind: r.id }); } };
+      }),
+      syncs: syncs
+    };
+  }
+}
+</script>
+</body>
+</html>

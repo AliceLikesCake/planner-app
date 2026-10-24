@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>每月預算</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Huninn&amp;family=Noto+Sans+TC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3D3A36}a:hover{color:#1F1D1B}
+button,input{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; display: flex; flex-direction: column; background: #FAF7F2; font-family: 'Noto Sans TC', system-ui, sans-serif; color: #3D3A36; overflow: hidden">
+  <div style="display: flex; align-items: center; gap: 4px; padding: 50px 12px 6px">
+    <a href="Settings.dc.html" aria-label="返回設定" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; text-decoration: none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3D3A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+    </a>
+    <div style="font-family: 'Huninn', 'Noto Sans TC', sans-serif; font-size: 22px">每月預算</div>
+  </div>
+
+  <div style="flex: 1; overflow-y: auto; padding: 8px 16px 32px; display: flex; flex-direction: column; gap: 12px">
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <span style="font-size: 13px; color: #6E6860">每月總預算</span>
+        <span style="font-size: 12px; color: #6E6860; font-variant-numeric: tabular-nums">{{allocText}}</span>
+      </div>
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+        <button onClick="{{minus}}" aria-label="減少 1000" style="width: 44px; height: 44px; border-radius: 22px; border: none; background: #F1ECE4; cursor: pointer; font-size: 22px; font-weight: 700; color: #3D3A36">−</button>
+        <span style="font-family: 'Huninn', 'Noto Sans TC', sans-serif; font-size: 34px; font-variant-numeric: tabular-nums">{{totalText}}</span>
+        <button onClick="{{plus}}" aria-label="增加 1000" style="width: 44px; height: 44px; border-radius: 22px; border: none; background: #F1ECE4; cursor: pointer; font-size: 22px; font-weight: 700; color: #3D3A36">+</button>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <div style="height: 8px; border-radius: 4px; background: #F1ECE4; overflow: hidden">
+          <div style="{{usedBar}}"></div>
+        </div>
+        <span style="font-size: 12px; color: #6E6860; font-variant-numeric: tabular-nums">{{usedText}}</span>
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: baseline; padding: 4px 6px 0">
+      <span style="font-size: 13px; font-weight: 700; color: #6E6860">各分類預算</span>
+      <span style="font-size: 12px; color: #6E6860">點 − ＋ 調整，每次 500</span>
+    </div>
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 0 14px">
+      <sc-for list="{{cats}}" as="c" hint-placeholder-count="6">
+        <div style="{{c.wrap}}">
+          <div style="display: flex; align-items: center; gap: 10px">
+            <span style="{{c.dot}}"></span>
+            <span style="flex: 1; min-width: 0; font-size: 15px; font-weight: 500">{{c.name}}</span>
+            <button onClick="{{c.minus}}" aria-label="{{c.minusAria}}" style="width: 32px; height: 32px; border-radius: 16px; border: none; background: #F5F1EA; cursor: pointer; font-size: 16px; font-weight: 700; color: #3D3A36">−</button>
+            <span style="width: 68px; text-align: center; font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums">{{c.limit}}</span>
+            <button onClick="{{c.plus}}" aria-label="{{c.plusAria}}" style="width: 32px; height: 32px; border-radius: 16px; border: none; background: #F5F1EA; cursor: pointer; font-size: 16px; font-weight: 700; color: #3D3A36">+</button>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; padding-left: 20px">
+            <div style="flex: 1; height: 6px; border-radius: 3px; background: #F3EEE6; overflow: hidden">
+              <div style="{{c.bar}}"></div>
+            </div>
+            <span style="{{c.leftStyle}}">{{c.left}}</span>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 0 16px">
+      <div style="display: flex; align-items: center; gap: 12px; min-height: 64px; border-bottom: 1px solid #F3EEE7">
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+          <span style="font-size: 15px">快超支時提醒我</span>
+          <span style="font-size: 12px; color: #6E6860">某個分類用到 80% 時通知</span>
+        </div>
+        <button onClick="{{flipWarn}}" role="switch" aria-checked="{{warnAria}}" aria-label="快超支時提醒我" style="{{warnTrack}}">
+          <span style="width: 26px; height: 26px; border-radius: 13px; background: #FFFFFF"></span>
+        </button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; min-height: 60px">
+        <span style="flex: 1; font-size: 15px">每月從幾號開始算</span>
+        <div style="background: #F1ECE4; border-radius: 14px; padding: 3px; display: flex; gap: 2px">
+          <sc-for list="{{starts}}" as="s" hint-placeholder-count="2">
+            <button onClick="{{s.pick}}" aria-pressed="{{s.pressed}}" style="{{s.style}}">{{s.label}}</button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { total: 25000, limits: { food: 8000, shop: 5000, life: 3500, transit: 2000, sub: 1000, other: 2000 }, warn: true, start: '1' };
+  }
+  renderVals() {
+    var self = this;
+    var st = this.state;
+    var used = { food: 6420, shop: 4300, life: 2870, transit: 1850, sub: 990, other: 1800 };
+    var defs = [
+      { id: 'food', name: '餐飲', c: '#E0A07F' }, { id: 'shop', name: '購物', c: '#A891CC' }, { id: 'life', name: '生活', c: '#D9BC6E' },
+      { id: 'transit', name: '交通', c: '#7FA3CF' }, { id: 'sub', name: '訂閱', c: '#D99BB8' }, { id: 'other', name: '其他', c: '#B5ADA2' }
+    ];
+    function m(n) { return '$' + n.toLocaleString('en-US'); }
+    var usedAll = 0, alloc = 0;
+    defs.forEach(function (d) { usedAll += used[d.id]; alloc += st.limits[d.id]; });
+    function setLimit(id, delta) {
+      var nx = Object.assign({}, self.state.limits);
+      nx[id] = Math.max(0, nx[id] + delta);
+      self.setState({ limits: nx });
+    }
+    var on = 'height: 32px; padding: 0 12px; border: none; border-radius: 11px; background: #FFFFFF; color: #3D3A36; font-size: 13px; font-weight: 700; cursor: pointer';
+    var off = 'height: 32px; padding: 0 12px; border: none; border-radius: 11px; background: transparent; color: #6E6860; font-size: 13px; font-weight: 500; cursor: pointer';
+    var wOn = st.warn;
+    return {
+      totalText: m(st.total),
+      allocText: '已分配 ' + m(alloc),
+      usedBar: 'height: 100%; border-radius: 4px; background: #E0A07F; width: ' + Math.min(100, Math.round(usedAll / st.total * 100)) + '%',
+      usedText: '這個月已用 ' + m(usedAll) + '（' + Math.round(usedAll / st.total * 100) + '%），還剩 ' + m(Math.max(0, st.total - usedAll)),
+      minus: function () { self.setState({ total: Math.max(0, self.state.total - 1000) }); },
+      plus: function () { self.setState({ total: self.state.total + 1000 }); },
+      cats: defs.map(function (d, i) {
+        var lim = st.limits[d.id];
+        var u = used[d.id];
+        var pct = lim ? u / lim : 1;
+        var over = u > lim;
+        return {
+          name: d.name, limit: m(lim),
+          minusAria: d.name + '預算減少 500', plusAria: d.name + '預算增加 500',
+          minus: function () { setLimit(d.id, -500); },
+          plus: function () { setLimit(d.id, 500); },
+          wrap: 'display: flex; flex-direction: column; gap: 8px; padding: 12px 0' + (i < defs.length - 1 ? '; border-bottom: 1px solid #F3EEE7' : ''),
+          dot: 'width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; background: ' + d.c,
+          bar: 'height: 100%; border-radius: 3px; width: ' + Math.min(100, Math.round(pct * 100)) + '%; background: ' + (over ? '#C77878' : d.c),
+          left: over ? '超支 ' + m(u - lim) : '剩 ' + m(lim - u),
+          leftStyle: 'width: 84px; text-align: right; font-size: 12px; font-variant-numeric: tabular-nums; ' + (over ? 'color: #8E3F3F; font-weight: 700' : (pct >= 0.8 ? 'color: #8A4A2B; font-weight: 700' : 'color: #6E6860'))
+        };
+      }),
+      warnAria: wOn ? 'true' : 'false',
+      warnTrack: 'width: 52px; height: 32px; border-radius: 16px; border: none; padding: 3px; cursor: pointer; flex-shrink: 0; display: flex; justify-content: ' + (wOn ? 'flex-end' : 'flex-start') + '; background: ' + (wOn ? '#8DB58F' : '#D9D2C7'),
+      flipWarn: function () { self.setState({ warn: !self.state.warn }); },
+      starts: [{ id: '1', label: '1 號' }, { id: '5', label: '發薪日 5 號' }].map(function (s) {
+        var sel = s.id === st.start;
+        return { label: s.label, pressed: sel ? 'true' : 'false', style: sel ? on : off, pick: function () { self.setState({ start: s.id }); } };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

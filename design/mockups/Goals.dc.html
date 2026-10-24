@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>習慣泡泡</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Huninn&amp;family=Noto+Sans+TC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3D3A36}a:hover{color:#1F1D1B}
+button{font-family:inherit}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes wobble{0%{transform:scale(1)}30%{transform:scale(1.08,0.94)}60%{transform:scale(0.96,1.04)}100%{transform:scale(1)}}
+@keyframes popGhost{0%{transform:scale(1.15);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes burst{0%{transform:scale(0.6);opacity:1}100%{transform:scale(1.5);opacity:0}}
+@keyframes drop{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(0.3);opacity:0}}
+@keyframes pop{0%{transform:scale(0.9);opacity:0}60%{transform:scale(1.05);opacity:1}100%{transform:scale(1)}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; display: flex; flex-direction: column; background: #FAF7F2; font-family: 'Noto Sans TC', system-ui, sans-serif; color: #3D3A36; overflow: hidden">
+  <div style="flex: 1; overflow-y: auto; padding: 50px 16px 110px; display: flex; flex-direction: column; gap: 14px">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 4px">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <div style="font-size: 13px; color: #6E6860">10月22日 星期四</div>
+        <div style="font-family: 'Huninn', 'Noto Sans TC', sans-serif; font-size: 26px">習慣打卡</div>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center">
+        <span style="font-family: 'Huninn', 'Noto Sans TC', sans-serif; font-size: 22px; font-variant-numeric: tabular-nums">{{todayDone}} / {{habitCount}}</span>
+        <button onClick="{{toggleSound}}" aria-label="{{soundAria}}" aria-pressed="{{soundPressed}}" style="{{soundStyle}}">
+          <sc-if value="{{soundOn}}" hint-placeholder-val="{{ true }}">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>
+          </sc-if>
+          <sc-if value="{{soundOff}}" hint-placeholder-val="{{ false }}">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path d="M16 10l5 5M21 10l-5 5"/></svg>
+          </sc-if>
+        </button>
+      </div>
+    </div>
+
+    <div style="background: #FFFFFF; border-radius: 26px; padding: 18px 10px 16px; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 10px; min-height: 300px">
+        <sc-for list="{{bubbles}}" as="b" hint-placeholder-count="5">
+          <div style="{{b.wrap}}">
+            <sc-if value="{{b.burst}}" hint-placeholder-val="{{ false }}">
+              <span style="{{b.ring}}"></span>
+              <sc-for list="{{b.drops}}" as="dp" hint-placeholder-count="0">
+                <span style="{{dp.s}}"></span>
+              </sc-for>
+            </sc-if>
+            <button onClick="{{b.tap}}" aria-label="{{b.aria}}" aria-pressed="{{b.pressed}}" style="{{b.style}}">
+              <sc-if value="{{b.alive}}" hint-placeholder-val="{{ true }}">
+                <span style="position: absolute; top: 14%; left: 20%; width: 22%; height: 14%; border-radius: 50%; background: rgba(255,255,255,0.75); transform: rotate(-30deg)"></span>
+              </sc-if>
+              <sc-if value="{{b.popped}}" hint-placeholder-val="{{ false }}">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8C857B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>
+              </sc-if>
+              <span style="{{b.nameStyle}}">{{b.name}}</span>
+              <span style="{{b.subStyle}}">{{b.sub}}</span>
+            </button>
+          </div>
+        </sc-for>
+      </div>
+      <div style="{{msgStyle}}">{{msg}}</div>
+    </div>
+
+    <div style="background: #FFFFFF; border-radius: 22px; padding: 14px; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <div style="font-family: 'Huninn', 'Noto Sans TC', sans-serif; font-size: 18px">10 月紀錄</div>
+        <div style="font-size: 13px; color: #6E6860; font-variant-numeric: tabular-nums">{{monthSummary}}</div>
+      </div>
+      <div style="display: flex; gap: 6px; overflow-x: auto">
+        <sc-for list="{{tabs}}" as="t" hint-placeholder-count="5">
+          <button onClick="{{t.pick}}" aria-pressed="{{t.pressed}}" style="{{t.style}}">{{t.name}}</button>
+        </sc-for>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; text-align: center; font-size: 11px; color: #6E6860">
+        <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px">
+        <sc-for list="{{month}}" as="m" hint-placeholder-count="35">
+          <span style="{{m.cell}}">
+            <span style="{{m.num}}">{{m.day}}</span>
+            <span style="display: flex; gap: 2px; justify-content: center; flex-wrap: wrap; max-width: 34px">
+              <sc-for list="{{m.dots}}" as="dt" hint-placeholder-count="0">
+                <span style="{{dt.s}}"></span>
+              </sc-for>
+            </span>
+          </span>
+        </sc-for>
+      </div>
+      <div style="display: flex; justify-content: space-between; gap: 8px; border-top: 1px dashed #E7E1D8; padding-top: 12px">
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <span style="font-size: 12px; color: #6E6860">{{stat1Label}}</span>
+          <span style="font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums">{{stat1}}</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <span style="font-size: 12px; color: #6E6860">目前連續</span>
+          <span style="font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums">{{mStreak}} 天</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <span style="font-size: 12px; color: #6E6860">最長連續</span>
+          <span style="font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums">{{mBest}} 天</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <a href="AddHabit.dc.html" aria-label="新增習慣" style="position: absolute; right: 20px; bottom: 100px; width: 56px; height: 56px; border-radius: 28px; background: #3D3A36; display: flex; align-items: center; justify-content: center; z-index: 5">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+  </a>
+
+  <nav style="height: 84px; flex-shrink: 0; background: #FFFFFF; border-radius: 28px 28px 0 0; box-shadow: 0 -4px 20px rgba(61,58,54,0.06); display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 8px 6px 14px; box-sizing: border-box; position: relative; z-index: 4">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; color: #6E6860; font-size: 11px; font-weight: 500">
+      <span style="width: 52px; height: 32px; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16M5 20v-6h14v6M7 14v-4h10v4M12 10V7"/><path d="M12 4.5c.8.6.8 1.6 0 2"/></svg></span>
+      <span>今日</span>
+    </a>
+    <a href="Calendar.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; color: #6E6860; font-size: 11px; font-weight: 500">
+      <span style="width: 52px; height: 32px; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="4"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></span>
+      <span>月曆</span>
+    </a>
+    <a href="Goals.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; color: #3D3A36; font-size: 11px; font-weight: 700">
+      <span style="width: 52px; height: 32px; border-radius: 16px; background: #F1ECE4; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></span>
+      <span>習慣</span>
+    </a>
+    <a href="Collabs.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; color: #6E6860; font-size: 11px; font-weight: 500">
+      <span style="width: 52px; height: 32px; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12.5V4.5h8l9 9-8 8z"/><circle cx="8" cy="9" r="1.5"/></svg></span>
+      <span>接案</span>
+    </a>
+    <a href="Money.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; color: #6E6860; font-size: 11px; font-weight: 500">
+      <span style="width: 52px; height: 32px; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="4"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1.2"/></svg></span>
+      <span>記帳</span>
+    </a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { water: 1250, done: { study: true, vitamin: true }, view: 'water', sound: true, last: null, wob: null, tick: 0 };
+  }
+  componentDidMount() {
+    var self = this;
+    try {
+      fetch('/_blob/cbaa30b8f9712083b5fb796f9809f0f7')
+        .then(function (r) { return r.ok ? r.arrayBuffer() : null; })
+        .then(function (buf) { self._bubbleRaw = buf; })
+        .catch(function () {});
+      fetch('/_blob/e3afc652c76fbfbd37a676235b95e4c7')
+        .then(function (r) { return r.ok ? r.arrayBuffer() : null; })
+        .then(function (buf) { self._glitterRaw = buf; })
+        .catch(function () {});
+    } catch (e) {}
+  }
+  audio() {
+    if (!this._ctx) {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      try { this._ctx = new AC(); } catch (e) { return null; }
+    }
+    if (this._ctx.state === 'suspended') { try { this._ctx.resume(); } catch (e) {} }
+    return this._ctx;
+  }
+  decode(key, rawKey) {
+    var self = this;
+    var ctx = this.audio();
+    if (!ctx) return Promise.resolve(null);
+    if (this[key]) return Promise.resolve(this[key]);
+    if (!this[rawKey]) return Promise.resolve(null);
+    return new Promise(function (resolve) {
+      try { ctx.decodeAudioData(self[rawKey].slice(0), function (b) { self[key] = b; resolve(b); }, function () { resolve(null); }); }
+      catch (e) { resolve(null); }
+    });
+  }
+  play(key, rawKey, rate, vol, delay, force) {
+    if (!force && !this.state.sound) return;
+    var ctx = this.audio();
+    if (!ctx) return;
+    this.decode(key, rawKey).then(function (buf) {
+      if (!buf) return;
+      var src = ctx.createBufferSource();
+      var g = ctx.createGain();
+      src.buffer = buf;
+      src.playbackRate.value = rate;
+      g.gain.value = vol;
+      src.connect(g);
+      g.connect(ctx.destination);
+      src.start(ctx.currentTime + (delay || 0));
+    });
+  }
+  popSound() { this.play('_bubbleBuf', '_bubbleRaw', 1.35, 1); }
+  sipSound(n) { this.play('_bubbleBuf', '_bubbleRaw', 0.8 + n * 0.05, 0.5); }
+  doneSound() { this.play('_glitterBuf', '_glitterRaw', 1, 0.85, 0.2); }
+  renderVals() {
+    var self = this;
+    var st = this.state;
+    var TODAY = 22;
+    var defs = [
+      { id: 'water', name: '喝水', goal: '2000 ml', fill: '#DCE8F5', text: '#3E5F8F', deep: '#7FA3CF', seed: 3, size: 132 },
+      { id: 'workout', name: '運動', goal: '30 分鐘', fill: '#F5DADA', text: '#8E3F3F', deep: '#DE9C9C', seed: 2, size: 118 },
+      { id: 'study', name: '日文單字', goal: '20 個', fill: '#DDEBDD', text: '#3D6442', deep: '#8DB58F', seed: 7, size: 112 },
+      { id: 'sleep', name: '早睡', goal: '12 點前', fill: '#E8E0F3', text: '#65508F', deep: '#A891CC', seed: 4, size: 120 },
+      { id: 'vitamin', name: '維他命', goal: '早餐後', fill: '#F6EBC8', text: '#7F6224', deep: '#D9BC6E', seed: 5, size: 104 }
+    ];
+    var total = defs.length;
+    function isDoneToday(h) { return !!st.done[h.id]; }
+    function past(h, day) { return ((day * 3 + h.seed * 5) % 7) > (h.id === 'workout' ? 3 : 1); }
+    function doneOn(h, day) {
+      if (day > TODAY) return null;
+      if (day === TODAY) return isDoneToday(h);
+      return past(h, day);
+    }
+    function streakOf(h) {
+      var s = 0;
+      var d = isDoneToday(h) ? TODAY : TODAY - 1;
+      while (d >= 1 && doneOn(h, d)) { s++; d--; }
+      return s;
+    }
+    function bestOf(h) {
+      var best = 0, cur = 0;
+      for (var d = 1; d <= TODAY; d++) { if (doneOn(h, d)) { cur++; if (cur > best) best = cur; } else cur = 0; }
+      return best;
+    }
+    function allOn(day) { return defs.every(function (h) { return doneOn(h, day); }); }
+    var todayDone = defs.filter(isDoneToday).length;
+
+    var bubbles = defs.map(function (h, i) {
+      var done = isDoneToday(h);
+      var justPopped = done && st.last === h.id;
+      var sz = h.size;
+      var drops = [];
+      if (justPopped) {
+        for (var k = 0; k < 8; k++) {
+          var ang = k / 8 * Math.PI * 2;
+          var dx = Math.round(Math.cos(ang) * sz * 0.62) + 'px';
+          var dy = Math.round(Math.sin(ang) * sz * 0.62) + 'px';
+          drops.push({ s: 'position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; pointer-events: none; background: ' + h.deep + '; --dx: ' + dx + '; --dy: ' + dy + '; animation: drop 520ms ease-out forwards' });
+        }
+      }
+      var sk = streakOf(h);
+      var sub = (done ? '連續 ' + sk + ' 天' : h.goal);
+      return {
+        name: h.name,
+        sub: sub,
+        alive: !done,
+        popped: done,
+        burst: justPopped,
+        drops: drops,
+        pressed: done ? 'true' : 'false',
+        aria: ((done ? '復原：' : '戳破：') + h.name),
+        wrap: 'position: relative; width: ' + sz + 'px; height: ' + sz + 'px; margin-top: ' + (i % 2 ? 22 : 0) + 'px',
+        ring: 'position: absolute; inset: 0; border-radius: 50%; border: 3px solid ' + h.deep + '; pointer-events: none; animation: burst 520ms ease-out forwards',
+        style: 'position: relative; width: 100%; height: 100%; border-radius: 50%; padding: 12px; box-sizing: border-box; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; overflow: hidden; ' +
+          (done
+            ? 'background: transparent; border: 2px dashed #D3CBBF; transform: scale(0.72); animation: popGhost 360ms ease-out'
+            : 'background: ' + h.fill + '; border: 2px solid ' + h.deep + '; box-shadow: inset -8px -10px 0 rgba(255,255,255,0.35); animation: ' + (st.wob === h.id + st.tick ? 'wobble 380ms ease-out' : 'float ' + (3.4 + i * 0.4) + 's ease-in-out ' + (i * 0.3) + 's infinite')),
+        nameStyle: "font-family: 'Huninn', 'Noto Sans TC', sans-serif; font-size: " + (sz >= 118 ? 17 : 15) + 'px; line-height: 1.2; text-align: center; color: ' + (done ? '#8C857B' : h.text),
+        subStyle: 'font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; color: ' + (done ? '#8C857B' : h.text),
+        tap: function () {
+          var nx = Object.assign({}, self.state.done);
+          nx[h.id] = !done;
+          self.setState({ done: nx, last: done ? null : h.id });
+          if (!done) {
+            self.popSound();
+            if (todayDone + 1 === total) self.doneSound();
+          }
+        }
+      };
+    });
+
+    var view = st.view;
+    var lead = 4;
+    var month = [];
+    for (var b = 0; b < lead; b++) month.push({ day: '', cell: 'height: 44px', num: 'display: none', dots: [] });
+    var mDone = 0;
+    for (var d = 1; d <= 31; d++) {
+      var isT = d === TODAY;
+      var future = d > TODAY;
+      var cell, num, dots = [];
+      if (view === 'all') {
+        var cnt = future ? 0 : defs.filter(function (h) { return doneOn(h, d); }).length;
+        var full = !future && cnt === total;
+        if (full) mDone++;
+        dots = future ? [] : defs.map(function (h) {
+          var ok = doneOn(h, d);
+          return { s: 'width: 6px; height: 6px; border-radius: 50%; box-sizing: border-box; ' + (ok ? 'background: ' + h.deep : 'border: 1.2px solid #D9D0C3') };
+        });
+        cell = 'height: 44px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; box-sizing: border-box; ' +
+          (future ? 'border: 1.5px dashed #E7E1D8' : (full ? 'background: #F1ECE4' : 'background: transparent'));
+        num = 'font-size: 11px; font-variant-numeric: tabular-nums; ' + (future ? 'color: #A8A198' : 'color: #3D3A36; font-weight: ' + (full ? '700' : '500'));
+      } else {
+        var h0 = defs.filter(function (h) { return h.id === view; })[0];
+        var dd = doneOn(h0, d);
+        if (dd) mDone++;
+        cell = 'height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-sizing: border-box; ' +
+          (dd === null ? 'border: 1.5px dashed #E7E1D8' : (dd ? 'background: ' + h0.fill + '; border: 2px solid ' + h0.deep : 'background: #F5F1EA'));
+        num = 'font-size: 12px; font-variant-numeric: tabular-nums; ' + (dd === null ? 'color: #A8A198' : (dd ? 'color: ' + h0.text + '; font-weight: 700' : 'color: #6E6860'));
+      }
+      month.push({ day: d, cell: cell + (isT ? '; box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 3.5px #3D3A36' : ''), num: num, dots: dots });
+    }
+
+    var tabDefs = defs;
+    var tabs = tabDefs.map(function (h) {
+      var on = h.id === view;
+      return {
+        name: h.name,
+        pressed: on ? 'true' : 'false',
+        pick: function () { self.setState({ view: h.id }); },
+        style: 'flex-shrink: 0; height: 36px; padding: 0 14px; border-radius: 18px; border: none; cursor: pointer; font-size: 13px; font-weight: ' + (on ? '700' : '500') + '; background: ' + (on ? h.fill : '#F5F1EA') + '; color: ' + (on ? h.text : '#5A544C') + (on ? '; box-shadow: inset 0 0 0 1.5px ' + h.deep : '')
+      };
+    });
+
+    var allStreak = 0, dd2 = todayDone === total ? TODAY : TODAY - 1;
+    while (dd2 >= 1 && allOn(dd2)) { allStreak++; dd2--; }
+    var allBest = 0, run = 0;
+    for (var q = 1; q <= TODAY; q++) { if (allOn(q)) { run++; if (run > allBest) allBest = run; } else run = 0; }
+    var curH = view === 'all' ? null : defs.filter(function (h) { return h.id === view; })[0];
+
+    var allDone = todayDone === total;
+    var soundOn = !!st.sound;
+    return {
+      bubbles: bubbles,
+      habitCount: total,
+      todayDone: todayDone,
+      msg: allDone ? '今天的泡泡全部戳破了！' : '輕點泡泡把它戳破，戳錯了再點一下可以復原',
+      msgStyle: allDone
+        ? "align-self: center; background: #DDEBDD; color: #3D6442; border-radius: 12px; padding: 6px 12px; font-size: 13px; font-weight: 700; animation: pop 400ms ease-out"
+        : 'font-size: 12px; color: #6E6860; text-align: center',
+      tabs: tabs,
+      month: month,
+      stat1Label: curH ? '本月完成' : '全部完成',
+      stat1: mDone + ' 天',
+      mStreak: curH ? streakOf(curH) : allStreak,
+      mBest: curH ? bestOf(curH) : allBest,
+      monthSummary: curH ? curH.name + ' · ' + Math.round(mDone / TODAY * 100) + '%' : '每一點代表一個習慣',
+      soundOn: soundOn,
+      soundOff: !soundOn,
+      soundPressed: soundOn ? 'true' : 'false',
+      soundAria: soundOn ? '音效開啟，點一下關閉' : '音效關閉，點一下開啟',
+      soundStyle: 'width: 44px; height: 44px; border-radius: 22px; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; background: ' + (soundOn ? '#F1ECE4' : '#FFFFFF') + '; color: ' + (soundOn ? '#3D3A36' : '#6E6860') + '; box-shadow: ' + (soundOn ? 'none' : 'inset 0 0 0 1px #E2DACE'),
+      toggleSound: function () {
+        var next = !self.state.sound;
+        self.setState({ sound: next });
+        if (next) self.play('_bubbleBuf', '_bubbleRaw', 1.2, 0.6, 0, true);
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>匯出 Excel</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Huninn&amp;family=Noto+Sans+TC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3D3A36}a:hover{color:#1F1D1B}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; display: flex; flex-direction: column; background: #FAF7F2; font-family: 'Noto Sans TC', system-ui, sans-serif; color: #3D3A36; overflow: hidden">
+  <div style="display: flex; align-items: center; gap: 4px; padding: 50px 12px 6px">
+    <a href="Settings.dc.html" aria-label="返回設定" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; text-decoration: none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3D3A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+    </a>
+    <div style="font-family: 'Huninn', 'Noto Sans TC', sans-serif; font-size: 22px">匯出 Excel</div>
+  </div>
+
+  <div style="flex: 1; overflow-y: auto; padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 12px">
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 15px; font-weight: 700">時間範圍</span>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">
+        <sc-for list="{{ranges}}" as="r" hint-placeholder-count="4">
+          <button onClick="{{r.pick}}" aria-pressed="{{r.pressed}}" style="{{r.style}}">{{r.label}}</button>
+        </sc-for>
+      </div>
+      <span style="font-size: 12px; color: #6E6860; font-variant-numeric: tabular-nums">{{rangeText}}</span>
+    </div>
+
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 6px 16px">
+      <div style="font-size: 15px; font-weight: 700; padding: 8px 0 4px">要匯出的內容</div>
+      <sc-for list="{{items}}" as="it" hint-placeholder-count="4">
+        <button onClick="{{it.flip}}" aria-pressed="{{it.pressed}}" style="{{it.row}}">
+          <span style="{{it.box}}">
+            <sc-if value="{{it.on}}" hint-placeholder-val="{{ false }}">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>
+            </sc-if>
+          </span>
+          <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; text-align: left">
+            <span style="font-size: 15px">{{it.label}}</span>
+            <span style="font-size: 12px; color: #6E6860">{{it.sub}}</span>
+          </span>
+          <span style="font-size: 12px; color: #6E6860; font-variant-numeric: tabular-nums">{{it.count}}</span>
+        </button>
+      </sc-for>
+    </div>
+
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 14px 16px; display: flex; align-items: center; gap: 12px">
+      <span style="flex: 1; font-size: 15px; font-weight: 700">檔案格式</span>
+      <div style="background: #F1ECE4; border-radius: 14px; padding: 3px; display: flex; gap: 2px">
+        <sc-for list="{{formats}}" as="f" hint-placeholder-count="2">
+          <button onClick="{{f.pick}}" aria-pressed="{{f.pressed}}" style="{{f.style}}">{{f.label}}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="background: #F1ECE4; border-radius: 18px; padding: 12px 14px; display: flex; align-items: center; gap: 12px">
+      <span style="width: 40px; height: 40px; border-radius: 12px; background: #DDEBDD; color: #3D6442; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12l4 5M13 12l-4 5"/></svg>
+      </span>
+      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 14px; font-weight: 700; word-break: break-all">{{fileName}}</span>
+        <span style="font-size: 12px; color: #5A544C">{{fileMeta}}</span>
+      </div>
+    </div>
+
+    <sc-if value="{{done}}" hint-placeholder-val="{{ false }}">
+      <div style="background: #DDEBDD; color: #3D6442; border-radius: 14px; padding: 10px 14px; font-size: 13px; font-weight: 700; text-align: center">已匯出，檔案存在「下載」資料夾</div>
+    </sc-if>
+  </div>
+
+  <div style="flex-shrink: 0; padding: 10px 16px 30px">
+    <button onClick="{{doExport}}" style="{{btnStyle}}">{{btnText}}</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { range: 'year', items: { money: true, gig: true, todo: false, habit: false }, format: 'xlsx', done: false };
+  }
+  renderVals() {
+    var self = this;
+    var st = this.state;
+    function chip(on) { return 'height: 38px; padding: 0; border-radius: 19px; border: none; cursor: pointer; font-size: 13px; font-weight: ' + (on ? '700' : '500') + '; background: ' + (on ? '#3D3A36' : '#F5F1EA') + '; color: ' + (on ? '#FFFFFF' : '#5A544C'); }
+    var ranges = { month: ['本月', '2026/10/01 – 10/31', '2026-10'], last: ['上個月', '2026/09/01 – 09/30', '2026-09'], year: ['今年', '2026/01/01 – 12/31', '2026'], custom: ['自訂', '選擇開始和結束日期', '自訂'] };
+    var mult = { month: 1, last: 1, year: 10, custom: 2 }[st.range];
+    var defs = [
+      { key: 'money', label: '記帳明細', sub: '日期、分類、金額、備註', n: 86 },
+      { key: 'gig', label: '接案收入', sub: '品牌、金額、入帳日、合約與勞報單狀態，報稅用', n: 6 },
+      { key: 'todo', label: '待辦完成紀錄', sub: '每天完成和未完成的待辦', n: 124 },
+      { key: 'habit', label: '習慣紀錄', sub: '每個習慣每天有沒有做到', n: 31 }
+    ];
+    var sheets = 0, rows = 0;
+    defs.forEach(function (d) { if (st.items[d.key]) { sheets++; rows += d.n * mult; } });
+    var on = 'height: 32px; padding: 0 12px; border: none; border-radius: 11px; background: #FFFFFF; color: #3D3A36; font-size: 13px; font-weight: 700; cursor: pointer';
+    var off = 'height: 32px; padding: 0 12px; border: none; border-radius: 11px; background: transparent; color: #6E6860; font-size: 13px; font-weight: 500; cursor: pointer';
+    var can = sheets > 0;
+    return {
+      ranges: Object.keys(ranges).map(function (k) {
+        var sel = k === st.range;
+        return { label: ranges[k][0], pressed: sel ? 'true' : 'false', style: chip(sel), pick: function () { self.setState({ range: k, done: false }); } };
+      }),
+      rangeText: ranges[st.range][1],
+      items: defs.map(function (d, i) {
+        var v = !!st.items[d.key];
+        return {
+          on: v, label: d.label, sub: d.sub, pressed: v ? 'true' : 'false',
+          count: (d.n * mult) + ' 筆',
+          flip: function () { var nx = Object.assign({}, self.state.items); nx[d.key] = !nx[d.key]; self.setState({ items: nx, done: false }); },
+          row: 'width: 100%; border: none; background: transparent; cursor: pointer; padding: 10px 0; display: flex; align-items: center; gap: 12px; color: #3D3A36' + (i < defs.length - 1 ? '; border-bottom: 1px solid #F3EEE7' : ''),
+          box: 'width: 22px; height: 22px; border-radius: 7px; box-sizing: border-box; flex-shrink: 0; display: flex; align-items: center; justify-content: center; ' + (v ? 'background: #8DB58F' : 'border: 2px solid #D3CBBF')
+        };
+      }),
+      formats: [{ id: 'xlsx', label: 'Excel' }, { id: 'csv', label: 'CSV' }].map(function (f) {
+        var sel = f.id === st.format;
+        return { label: f.label, pressed: sel ? 'true' : 'false', style: sel ? on : off, pick: function () { self.setState({ format: f.id, done: false }); } };
+      }),
+      fileName: '我的紀錄_' + ranges[st.range][2] + '.' + st.format,
+      fileMeta: can ? (st.format === 'xlsx' ? sheets + ' 個工作表 · ' : '') + '共 ' + rows + ' 筆' : '請至少選一項內容',
+      done: st.done,
+      btnText: st.done ? '再匯出一次' : '匯出',
+      btnStyle: 'width: 100%; height: 52px; border-radius: 26px; border: none; cursor: pointer; font-size: 16px; font-weight: 700; ' + (can ? 'background: #3D3A36; color: #FFFFFF' : 'background: #E6E2DC; color: #8C857B'),
+      doExport: function () { if (can) self.setState({ done: true }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

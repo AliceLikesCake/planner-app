@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>設定</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Huninn&amp;family=Noto+Sans+TC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3D3A36}a:hover{color:#1F1D1B}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; display: flex; flex-direction: column; background: #FAF7F2; font-family: 'Noto Sans TC', system-ui, sans-serif; color: #3D3A36; overflow: hidden">
+  <div style="display: flex; align-items: center; gap: 4px; padding: 50px 12px 6px">
+    <a href="Main.dc.html" aria-label="返回" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; text-decoration: none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3D3A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+    </a>
+    <div style="font-family: 'Huninn', 'Noto Sans TC', sans-serif; font-size: 24px">設定</div>
+  </div>
+
+  <div style="flex: 1; overflow-y: auto; padding: 8px 16px 32px; display: flex; flex-direction: column; gap: 8px">
+    <div style="position: relative; background: #FFFFFF; border-radius: 20px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; margin-bottom: 8px">
+      <a href="SetBackup.dc.html" aria-label="帳號與備份" style="position: absolute; inset: 0; border-radius: 20px"></a>
+      <span style="width: 48px; height: 48px; border-radius: 50%; background: #F5DADA; color: #8E3F3F; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M5.5 19a6.5 6.5 0 0 1 13 0"/></svg></span>
+      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 16px; font-weight: 700">我的帳號</span>
+        <span style="font-size: 12px; color: #6E6860">資料已同步 · 手機和電腦都看得到</span>
+      </div>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A8A198" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+    </div>
+
+    <sc-for list="{{sections}}" as="sec" hint-placeholder-count="5">
+      <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px">
+        <div style="font-size: 13px; font-weight: 700; color: #6E6860; padding: 0 6px">{{sec.title}}</div>
+        <div style="background: #FFFFFF; border-radius: 20px; padding: 0 16px">
+          <sc-for list="{{sec.rows}}" as="r" hint-placeholder-count="3">
+            <div style="{{r.rowStyle}}">
+              <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+                <span style="font-size: 15px">{{r.label}}</span>
+                <sc-if value="{{r.hasSub}}" hint-placeholder-val="{{ false }}">
+                  <span style="font-size: 12px; color: #6E6860">{{r.sub}}</span>
+                </sc-if>
+              </div>
+              <sc-if value="{{r.isToggle}}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{r.act}}" role="switch" aria-checked="{{r.aria}}" aria-label="{{r.label}}" style="{{r.track}}">
+                  <span style="width: 26px; height: 26px; border-radius: 13px; background: #FFFFFF"></span>
+                </button>
+              </sc-if>
+              <sc-if value="{{r.isSeg}}" hint-placeholder-val="{{ false }}">
+                <div style="background: #F1ECE4; border-radius: 14px; padding: 3px; display: flex; gap: 2px; flex-shrink: 0">
+                  <sc-for list="{{r.opts}}" as="o" hint-placeholder-count="2">
+                    <button onClick="{{o.pick}}" aria-pressed="{{o.pressed}}" style="{{o.style}}">{{o.label}}</button>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <sc-if value="{{r.hasHref}}" hint-placeholder-val="{{ false }}">
+                <a href="{{r.href}}" aria-label="{{r.label}}" style="position: absolute; inset: 0"></a>
+              </sc-if>
+              <sc-if value="{{r.isLink}}" hint-placeholder-val="{{ false }}">
+                <span style="display: flex; align-items: center; gap: 6px; flex-shrink: 0">
+                  <sc-for list="{{r.dots}}" as="dt" hint-placeholder-count="0">
+                    <span style="{{dt.s}}"></span>
+                  </sc-for>
+                  <span style="font-size: 14px; color: #6E6860; font-variant-numeric: tabular-nums">{{r.value}}</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A8A198" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+                </span>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+
+    <div style="text-align: center; font-size: 12px; color: #A8A198; padding: 4px 0 8px">版本 1.0.0</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { lang: 'zh', weekStart: 'mon', dark: false, sound: true, push: true, deadline: true, overdue: true, habitRemind: true, autoMoney: true, autoCal: true, rollover: true };
+  }
+  renderVals() {
+    var self = this;
+    var st = this.state;
+    var list = [];
+    function toggle(key, label, sub) {
+      var on = !!st[key];
+      return {
+        kind: 'toggle', label: label, sub: sub || '', aria: on ? 'true' : 'false',
+        act: function () { var p = {}; p[key] = !self.state[key]; self.setState(p); },
+        track: 'width: 52px; height: 32px; border-radius: 16px; border: none; padding: 3px; cursor: pointer; flex-shrink: 0; display: flex; justify-content: ' + (on ? 'flex-end' : 'flex-start') + '; background: ' + (on ? '#8DB58F' : '#D9D2C7')
+      };
+    }
+    function seg(key, label, opts, sub) {
+      return {
+        kind: 'seg', label: label, sub: sub || '',
+        opts: opts.map(function (o) {
+          var on = st[key] === o.id;
+          return {
+            label: o.label, pressed: on ? 'true' : 'false',
+            pick: function () { var p = {}; p[key] = o.id; self.setState(p); },
+            style: 'height: 32px; padding: 0 12px; border: none; border-radius: 11px; cursor: pointer; font-size: 13px; font-weight: ' + (on ? '700' : '500') + '; background: ' + (on ? '#FFFFFF' : 'transparent') + '; color: ' + (on ? '#3D3A36' : '#6E6860')
+          };
+        })
+      };
+    }
+    var hrefs = { '類別與顏色': 'SetCategories.dc.html', '記帳分類': 'SetCategories.dc.html', '每日蛋糕': 'SetCakes.dc.html', '每月預算': 'SetBudget.dc.html', '匯出 Excel': 'SetExport.dc.html', '備份與同步': 'SetBackup.dc.html' };
+    function link(label, value, sub, dots) { return { kind: 'link', label: label, value: value || '', sub: sub || '', dots: dots || [], href: hrefs[label] || '' }; }
+    var catDots = ['#7FA3CF', '#A891CC', '#8DB58F', '#D9BC6E', '#DE9C9C'].map(function (c) { return { s: 'width: 10px; height: 10px; border-radius: 50%; background: ' + c }; });
+    var sections = [
+      { title: '一般', rows: [
+        seg('lang', '語言', [{ id: 'zh', label: '中文' }, { id: 'en', label: 'English' }]),
+        seg('weekStart', '一週從', [{ id: 'mon', label: '週一' }, { id: 'sun', label: '週日' }]),
+        toggle('dark', '深色模式', '晚上看比較不刺眼')
+      ] },
+      { title: '今日待辦與蛋糕', rows: [
+        link('類別與顏色', '', '工作、接案、學習、生活、健康', catDots),
+        toggle('rollover', '沒做完的自動移到明天', '每天凌晨把未完成的待辦搬到隔天'),
+        link('每日蛋糕', '週一到週日', '查看七種甜點的樣子')
+      ] },
+      { title: '音效與通知', rows: [
+        toggle('sound', '音效', '疊蛋糕、戳泡泡的聲音'),
+        toggle('push', '推播通知'),
+        toggle('deadline', '接案交稿提醒', '交稿和上線的前一天提醒'),
+        toggle('overdue', '入帳逾期提醒', '超過預計入帳日還沒收到款項時提醒'),
+        link('習慣提醒時間', '21:30')
+      ] },
+      { title: '自動同步', rows: [
+        toggle('autoCal', '接案日期加到月曆', '交稿、上線、入帳日自動出現在月曆'),
+        toggle('autoMoney', '接案入帳自動記帳', '標記已入帳時，新增一筆接案收入')
+      ] },
+      { title: '記帳', rows: [
+        link('每月預算', '$25,000'),
+        link('記帳分類', '', '餐飲、購物、交通、訂閱…'),
+        link('匯出 Excel', '', '記帳和接案收入，報稅用')
+      ] },
+      { title: '資料', rows: [
+        link('備份與同步', '已開啟'),
+        link('意見回饋')
+      ] }
+    ];
+    sections.forEach(function (s) {
+      s.rows = s.rows.map(function (r, i) {
+        r.isToggle = r.kind === 'toggle';
+        r.isSeg = r.kind === 'seg';
+        r.isLink = r.kind === 'link';
+        r.hasSub = !!r.sub;
+        r.hasHref = !!r.href;
+        if (!r.href) r.href = '#';
+        r.rowStyle = 'position: relative; display: flex; align-items: center; gap: 12px; min-height: ' + (r.sub ? 64 : 54) + 'px; padding: 6px 0; box-sizing: border-box' + (i < s.rows.length - 1 ? '; border-bottom: 1px solid #F3EEE7' : '') + (r.isLink ? '; cursor: pointer' : '');
+        if (!r.opts) r.opts = [];
+        if (!r.dots) r.dots = [];
+        return r;
+      });
+    });
+    return { sections: sections };
+  }
+}
+</script>
+</body>
+</html>

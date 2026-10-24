@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>新增接案</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Huninn&amp;family=Noto+Sans+TC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3D3A36}a:hover{color:#1F1D1B}
+button,input,textarea{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; display: flex; flex-direction: column; background: #FAF7F2; font-family: 'Noto Sans TC', system-ui, sans-serif; color: #3D3A36; overflow: hidden">
+  <div style="display: flex; justify-content: space-between; align-items: center; padding: 50px 12px 6px">
+    <a href="Collabs.dc.html" style="height: 44px; padding: 0 12px; display: flex; align-items: center; font-size: 15px; color: #6E6860; text-decoration: none">取消</a>
+    <div style="font-family: 'Huninn', 'Noto Sans TC', sans-serif; font-size: 19px">新增接案</div>
+    <a href="Collabs.dc.html" style="height: 40px; padding: 0 16px; border-radius: 20px; background: #3D3A36; color: #FFFFFF; display: flex; align-items: center; font-size: 14px; font-weight: 700; text-decoration: none">儲存</a>
+  </div>
+
+  <div style="flex: 1; overflow-y: auto; padding: 8px 16px 32px; display: flex; flex-direction: column; gap: 14px">
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 4px 16px">
+      <div style="display: flex; flex-direction: column; gap: 4px; padding: 12px 0; border-bottom: 1px solid #F3EEE7">
+        <label for="c-brand" style="font-size: 12px; font-weight: 700; color: #6E6860">品牌名稱</label>
+        <input id="c-brand" type="text" value="品牌 G" style="border: none; outline: none; font-size: 18px; font-weight: 700; color: #3D3A36; padding: 2px 0; background: transparent">
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; min-height: 54px; border-bottom: 1px solid #F3EEE7">
+        <label for="c-amt" style="font-size: 15px">合作金額（稅前）</label>
+        <input id="c-amt" type="text" value="NT$ 7,000" style="border: none; outline: none; text-align: right; font-size: 16px; font-weight: 700; color: #3D3A36; background: transparent; width: 130px">
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; min-height: 54px">
+        <label for="c-contact" style="font-size: 15px">聯絡窗口（選填）</label>
+        <input id="c-contact" type="text" value="小林 · LINE" style="border: none; outline: none; text-align: right; font-size: 15px; color: #3D3A36; background: transparent; width: 150px">
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="font-size: 14px; font-weight: 700; padding: 0 4px">產品類別</div>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+        <sc-for list="{{cats}}" as="c" hint-placeholder-count="6">
+          <button onClick="{{c.pick}}" aria-pressed="{{c.pressed}}" style="{{c.style}}">{{c.name}}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="font-size: 14px; font-weight: 700; padding: 0 4px">合作形式（可複選）</div>
+      <div style="display: flex; gap: 6px; flex-wrap: wrap">
+        <sc-for list="{{kinds}}" as="k" hint-placeholder-count="5">
+          <button onClick="{{k.pick}}" aria-pressed="{{k.pressed}}" style="{{k.style}}">{{k.name}}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 4px 16px">
+      <div style="font-size: 12px; font-weight: 700; color: #6E6860; padding: 12px 0 2px">重要日期</div>
+      <sc-for list="{{dates}}" as="dt" hint-placeholder-count="3">
+        <div style="display: flex; justify-content: space-between; align-items: center; min-height: 52px; border-bottom: 1px solid #F3EEE7">
+          <span style="display: flex; align-items: center; gap: 8px; font-size: 15px"><span style="{{dt.dot}}"></span>{{dt.label}}</span>
+          <span style="font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums">{{dt.value}}</span>
+        </div>
+      </sc-for>
+      <div style="height: 6px"></div>
+    </div>
+
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 12px 16px; display: flex; flex-direction: column; gap: 8px">
+      <div style="font-size: 12px; font-weight: 700; color: #6E6860">文件</div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+        <sc-for list="{{docs}}" as="d" hint-placeholder-count="2">
+          <button onClick="{{d.flip}}" aria-pressed="{{d.pressed}}" style="{{d.style}}">
+            <span style="{{d.box}}">
+              <sc-if value="{{d.on}}" hint-placeholder-val="{{ false }}">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>
+              </sc-if>
+            </span>
+            {{d.label}}
+          </button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 14px 16px 6px; display: flex; flex-direction: column; gap: 2px">
+      <div style="font-size: 15px; font-weight: 700">自動同步</div>
+      <div style="font-size: 12px; color: #6E6860; padding-bottom: 6px">填好日期後，這些會自動幫你建立</div>
+      <sc-for list="{{syncs}}" as="sy" hint-placeholder-count="4">
+        <div style="display: flex; align-items: center; gap: 12px; min-height: 62px; border-top: 1px solid #F3EEE7">
+          <span style="{{sy.tag}}">{{sy.where}}</span>
+          <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+            <span style="font-size: 14px; font-weight: 500">{{sy.title}}</span>
+            <span style="font-size: 12px; color: #6E6860">{{sy.detail}}</span>
+          </div>
+          <button onClick="{{sy.flip}}" role="switch" aria-checked="{{sy.aria}}" aria-label="{{sy.title}}" style="{{sy.track}}">
+            <span style="width: 22px; height: 22px; border-radius: 11px; background: #FFFFFF"></span>
+          </button>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
+      <label for="c-note" style="font-size: 12px; font-weight: 700; color: #6E6860">備註</label>
+      <textarea id="c-note" rows="2" style="border: none; outline: none; resize: none; font-size: 15px; color: #3D3A36; padding: 2px 0; background: transparent">需標註官方帳號，hashtag 用 #品牌G秋冬新品</textarea>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { cat: 'skin', kinds: { post: true, story: true }, contract: true, labor: false, sync: { cal: true, todo: true, docs: true, money: true } };
+  }
+  renderVals() {
+    var self = this;
+    var st = this.state;
+    var cats = [
+      { id: 'beauty', name: '彩妝', fill: '#F5DADA', text: '#8E3F3F', deep: '#DE9C9C' },
+      { id: 'skin', name: '保養', fill: '#F6DDE9', text: '#8A3D62', deep: '#D99BB8' },
+      { id: 'food', name: '食品飲料', fill: '#F6EBC8', text: '#7F6224', deep: '#D9BC6E' },
+      { id: 'home', name: '生活用品', fill: '#DDEBDD', text: '#3D6442', deep: '#8DB58F' },
+      { id: 'tech', name: '3C 家電', fill: '#DCE8F5', text: '#3E5F8F', deep: '#7FA3CF' },
+      { id: 'fashion', name: '服飾配件', fill: '#E8E0F3', text: '#65508F', deep: '#A891CC' }
+    ];
+    var kinds = [{ id: 'post', name: 'IG 貼文' }, { id: 'reels', name: 'IG Reels' }, { id: 'story', name: '限動' }, { id: 'yt', name: 'YouTube' }, { id: 'blog', name: '部落格' }];
+    function chip(on) {
+      return 'height: 38px; padding: 0 14px; border-radius: 19px; border: none; cursor: pointer; font-size: 13px; font-weight: ' + (on ? '700' : '500') + '; background: ' + (on ? '#3D3A36' : '#FFFFFF') + '; color: ' + (on ? '#FFFFFF' : '#5A544C') + (on ? '' : '; box-shadow: inset 0 0 0 1px #EAE4DB');
+    }
+    function track(on) { return 'width: 46px; height: 28px; border-radius: 14px; border: none; padding: 3px; cursor: pointer; flex-shrink: 0; display: flex; justify-content: ' + (on ? 'flex-end' : 'flex-start') + '; background: ' + (on ? '#8DB58F' : '#D9D2C7'); }
+    var s = st.sync;
+    var missing = [];
+    if (!st.contract) missing.push('合約');
+    if (!st.labor) missing.push('勞報單');
+    var syncDefs = [
+      { key: 'cal', where: '月曆', fill: '#DCE8F5', text: '#3E5F8F', title: '交稿、上線、入帳日', detail: '10/30 交稿 · 11/05 上線 · 12/15 入帳' },
+      { key: 'todo', where: '待辦', fill: '#F6EBC8', text: '#7F6224', title: '交稿和上線前提醒', detail: '10/29 準備交稿 · 11/05 確認貼文上線' },
+      { key: 'docs', where: '待辦', fill: '#F6EBC8', text: '#7F6224', title: missing.length ? '簽' + missing.join('、') : '文件都簽好了', detail: missing.length ? '明天的待辦會出現，簽完自動打勾' : '不需要額外提醒' },
+      { key: 'money', where: '記帳', fill: '#D6EEE8', text: '#36705F', title: '入帳後自動記一筆收入', detail: '標記已入帳時，新增「接案 +7,000」' }
+    ];
+    return {
+      cats: cats.map(function (c) {
+        var on = c.id === st.cat;
+        return {
+          name: c.name, pressed: on ? 'true' : 'false',
+          pick: function () { self.setState({ cat: c.id }); },
+          style: 'height: 42px; border-radius: 14px; cursor: pointer; font-size: 13px; border: 2px solid ' + (on ? c.deep : 'transparent') + '; background: ' + (on ? c.fill : '#FFFFFF') + '; color: ' + (on ? c.text : '#5A544C') + '; font-weight: ' + (on ? '700' : '500')
+        };
+      }),
+      kinds: kinds.map(function (k) {
+        var on = !!st.kinds[k.id];
+        return {
+          name: k.name, pressed: on ? 'true' : 'false', style: chip(on),
+          pick: function () { var nx = Object.assign({}, self.state.kinds); nx[k.id] = !nx[k.id]; self.setState({ kinds: nx }); }
+        };
+      }),
+      dates: [
+        { label: '交稿日', value: '10月30日（五）', c: '#A891CC' },
+        { label: '上線日', value: '11月5日（四）', c: '#7FA3CF' },
+        { label: '預計入帳日', value: '12月15日（二）', c: '#7DBFB0' }
+      ].map(function (d) { return { label: d.label, value: d.value, dot: 'width: 10px; height: 10px; border-radius: 50%; background: ' + d.c }; }),
+      docs: [{ key: 'contract', label: '合約已簽' }, { key: 'labor', label: '勞報單已簽' }].map(function (d) {
+        var on = !!st[d.key];
+        return {
+          on: on, label: d.label, pressed: on ? 'true' : 'false',
+          flip: function () { var p = {}; p[d.key] = !self.state[d.key]; self.setState(p); },
+          style: 'height: 46px; border-radius: 14px; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 0 12px; font-size: 14px; font-weight: 500; background: ' + (on ? '#F5F1EA' : '#FFFFFF') + '; color: #3D3A36; box-shadow: inset 0 0 0 1px ' + (on ? 'transparent' : '#EAE4DB'),
+          box: 'width: 20px; height: 20px; border-radius: 6px; box-sizing: border-box; flex-shrink: 0; display: flex; align-items: center; justify-content: center; ' + (on ? 'background: #8DB58F' : 'border: 2px solid #D3CBBF')
+        };
+      }),
+      syncs: syncDefs.map(function (x) {
+        var on = !!s[x.key];
+        return {
+          where: x.where, title: x.title, detail: x.detail, aria: on ? 'true' : 'false',
+          tag: 'flex-shrink: 0; width: 44px; text-align: center; font-size: 11px; font-weight: 700; padding: 4px 0; border-radius: 10px; background: ' + x.fill + '; color: ' + x.text,
+          track: track(on),
+          flip: function () { var nx = Object.assign({}, self.state.sync); nx[x.key] = !nx[x.key]; self.setState({ sync: nx }); }
+        };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

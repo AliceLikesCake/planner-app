@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>類別與顏色</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Huninn&amp;family=Noto+Sans+TC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3D3A36}a:hover{color:#1F1D1B}
+button,input{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; display: flex; flex-direction: column; background: #FAF7F2; font-family: 'Noto Sans TC', system-ui, sans-serif; color: #3D3A36; overflow: hidden">
+  <div style="display: flex; align-items: center; gap: 4px; padding: 50px 12px 6px">
+    <a href="Settings.dc.html" aria-label="返回設定" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; text-decoration: none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3D3A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+    </a>
+    <div style="font-family: 'Huninn', 'Noto Sans TC', sans-serif; font-size: 22px">類別與顏色</div>
+  </div>
+
+  <div style="flex: 1; overflow-y: auto; padding: 8px 16px 32px; display: flex; flex-direction: column; gap: 12px">
+    <div style="background: #F1ECE4; border-radius: 16px; padding: 3px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px">
+      <button onClick="{{showTodo}}" aria-pressed="{{todoPressed}}" style="{{todoTab}}">待辦類別</button>
+      <button onClick="{{showMoney}}" aria-pressed="{{moneyPressed}}" style="{{moneyTab}}">記帳分類</button>
+    </div>
+    <div style="font-size: 12px; color: #6E6860; padding: 0 4px">{{hint}}</div>
+
+    <sc-for list="{{groups}}" as="g" hint-placeholder-count="1">
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <sc-if value="{{g.hasTitle}}" hint-placeholder-val="{{ false }}">
+          <div style="font-size: 13px; font-weight: 700; color: #6E6860; padding: 4px 6px 0">{{g.title}}</div>
+        </sc-if>
+        <div style="background: #FFFFFF; border-radius: 20px; padding: 0 14px">
+          <sc-for list="{{g.rows}}" as="r" hint-placeholder-count="5">
+            <div style="{{r.wrap}}">
+              <button onClick="{{r.open}}" aria-expanded="{{r.expanded}}" style="width: 100%; min-height: 56px; border: none; background: transparent; padding: 0; cursor: pointer; display: flex; align-items: center; gap: 12px; text-align: left; color: #3D3A36">
+                <span style="{{r.swatch}}"></span>
+                <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+                  <span style="font-size: 15px; font-weight: 500">{{r.name}}</span>
+                  <span style="font-size: 12px; color: #6E6860">{{r.meta}}</span>
+                </span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A8A198" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{r.chev}}"/></svg>
+              </button>
+              <sc-if value="{{r.isOpen}}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; flex-direction: column; gap: 10px; padding: 2px 0 14px">
+                  <div style="display: flex; align-items: center; gap: 8px; background: #FAF7F2; border-radius: 12px; padding: 0 12px; height: 44px">
+                    <label for="cat-name" style="font-size: 13px; color: #6E6860; flex-shrink: 0">名稱</label>
+                    <input id="cat-name" type="text" value="{{r.name}}" style="flex: 1; min-width: 0; border: none; outline: none; background: transparent; font-size: 15px; font-weight: 700; color: #3D3A36">
+                  </div>
+                  <div style="display: flex; gap: 8px; flex-wrap: wrap">
+                    <sc-for list="{{r.colors}}" as="c" hint-placeholder-count="8">
+                      <button onClick="{{c.pick}}" aria-label="{{c.label}}" aria-pressed="{{c.pressed}}" style="{{c.style}}">
+                        <sc-if value="{{c.on}}" hint-placeholder-val="{{ false }}">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3D3A36" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>
+                        </sc-if>
+                      </button>
+                    </sc-for>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center">
+                    <span style="{{r.preview}}">{{r.name}}</span>
+                    <button style="height: 36px; padding: 0 12px; border: none; border-radius: 18px; background: transparent; color: #A0605A; font-size: 13px; font-weight: 700; cursor: pointer">刪除這個類別</button>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+
+    <button style="height: 52px; border-radius: 18px; border: 2px dashed #D3CBBF; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 15px; font-weight: 700; color: #5A544C">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      新增類別
+    </button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      tab: 'todo',
+      open: 'work',
+      color: { work: 'blue', gig: 'lav', study: 'green', life: 'butter', health: 'rose', food: 'peach', shop: 'lav', mlife: 'butter', transit: 'blue', fun: 'green', med: 'rose', sub: 'pink', other: 'sand', salary: 'mint', mgig: 'lav', iother: 'sand' }
+    };
+  }
+  renderVals() {
+    var self = this;
+    var st = this.state;
+    var P = {
+      blue: { fill: '#DCE8F5', text: '#3E5F8F', deep: '#7FA3CF', name: '霧藍' },
+      lav: { fill: '#E8E0F3', text: '#65508F', deep: '#A891CC', name: '薰衣草' },
+      green: { fill: '#DDEBDD', text: '#3D6442', deep: '#8DB58F', name: '鼠尾草' },
+      peach: { fill: '#F8E1D4', text: '#8A4A2B', deep: '#E0A07F', name: '蜜桃' },
+      butter: { fill: '#F6EBC8', text: '#7F6224', deep: '#D9BC6E', name: '奶油黃' },
+      rose: { fill: '#F5DADA', text: '#8E3F3F', deep: '#DE9C9C', name: '乾燥玫瑰' },
+      mint: { fill: '#D6EEE8', text: '#36705F', deep: '#7DBFB0', name: '薄荷' },
+      pink: { fill: '#F6DDE9', text: '#8A3D62', deep: '#D99BB8', name: '粉紅' },
+      sand: { fill: '#EDE8E1', text: '#5A544C', deep: '#B5ADA2', name: '奶茶' }
+    };
+    var isTodo = st.tab === 'todo';
+    var groups = isTodo ? [
+      { title: '', rows: [['work', '工作', '本月 42 件'], ['gig', '接案', '本月 18 件'], ['study', '學習', '本月 26 件'], ['life', '生活', '本月 31 件'], ['health', '健康', '本月 15 件']] }
+    ] : [
+      { title: '支出', rows: [['food', '餐飲', '$6,420'], ['shop', '購物', '$4,300'], ['mlife', '生活', '$2,870'], ['transit', '交通', '$1,850'], ['fun', '娛樂', '$0'], ['med', '醫療', '$0'], ['sub', '訂閱', '$990'], ['other', '其他', '$1,800']] },
+      { title: '收入', rows: [['salary', '薪資', '$33,500'], ['mgig', '接案', '$5,000'], ['iother', '其他', '$0']] }
+    ];
+    var on = 'height: 40px; border: none; border-radius: 13px; background: #FFFFFF; color: #3D3A36; font-size: 14px; font-weight: 700; cursor: pointer';
+    var off = 'height: 40px; border: none; border-radius: 13px; background: transparent; color: #6E6860; font-size: 14px; font-weight: 500; cursor: pointer';
+    return {
+      todoPressed: isTodo ? 'true' : 'false',
+      moneyPressed: isTodo ? 'false' : 'true',
+      todoTab: isTodo ? on : off,
+      moneyTab: isTodo ? off : on,
+      showTodo: function () { self.setState({ tab: 'todo', open: 'work' }); },
+      showMoney: function () { self.setState({ tab: 'money', open: null }); },
+      hint: isTodo ? '待辦的顏色也會用在今日蛋糕的每一層和月曆' : '記帳分類會出現在「記一筆」和每月統計',
+      groups: groups.map(function (g) {
+        return {
+          title: g.title, hasTitle: !!g.title,
+          rows: g.rows.map(function (r, i) {
+            var id = r[0];
+            var c = P[st.color[id]];
+            var isOpen = st.open === id;
+            return {
+              name: r[1], meta: r[2], isOpen: isOpen, expanded: isOpen ? 'true' : 'false',
+              chev: isOpen ? 'M5 9l7 7 7-7' : 'M9 5l7 7-7 7',
+              open: function () { self.setState({ open: self.state.open === id ? null : id }); },
+              wrap: i < g.rows.length - 1 ? 'border-bottom: 1px solid #F3EEE7' : '',
+              swatch: 'width: 28px; height: 28px; border-radius: 10px; flex-shrink: 0; background: ' + c.fill + '; box-shadow: inset 0 0 0 2px ' + c.deep,
+              preview: 'font-size: 13px; font-weight: 700; padding: 4px 12px; border-radius: 12px; background: ' + c.fill + '; color: ' + c.text,
+              colors: Object.keys(P).map(function (k) {
+                var p = P[k];
+                var sel = st.color[id] === k;
+                return {
+                  on: sel, pressed: sel ? 'true' : 'false', label: p.name,
+                  pick: function () { var nx = Object.assign({}, self.state.color); nx[id] = k; self.setState({ color: nx }); },
+                  style: 'width: 36px; height: 36px; border-radius: 50%; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; background: ' + p.fill + '; border: 3px solid ' + (sel ? '#3D3A36' : p.deep)
+                };
+              })
+            };
+          })
+        };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>
