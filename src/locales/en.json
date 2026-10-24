@@ -44,7 +44,8 @@
     "medical": "Medical",
     "subscription": "Subscriptions",
     "other": "Other",
-    "salary": "Salary"
+    "salary": "Salary",
+    "none": "Uncategorized"
   },
   "product": {
     "beauty": "Makeup",
@@ -210,7 +211,8 @@
     "editSavings": "Change savings",
     "detailFilter": "Filter entries: all, spending or income",
     "categoryFilter": "Filter entries by category",
-    "allCategories": "All categories"
+    "allCategories": "All categories",
+    "budgetWarn": "{pct}% used, close to the limit"
   },
   "settings": {
     "title": "Settings",
@@ -245,7 +247,25 @@
     "version": "Version {v}",
     "langZh": "中文",
     "langEn": "English",
-    "accountBackup": "Account & backup"
+    "accountBackup": "Account & backup",
+    "darkSub": "Coming later",
+    "categoriesSub": "Work, gigs, study, life, health",
+    "rolloverSub": "On the first open each day, move unfinished to-dos to today",
+    "cakesValue": "Mon to Sun",
+    "cakesSub": "Ten desserts, or a random set each week",
+    "soundSub": "Cake stacking and bubble popping",
+    "pushSub": "Push is coming later; your choice is saved for then",
+    "remindDeliverSub": "The day before delivery and going live",
+    "remindOverdueSub": "When a payment is past its due date",
+    "syncCalendarSub": "Delivery, live and payment dates show in the calendar",
+    "syncMoneySub": "Marking a gig paid logs the income",
+    "savings": "Savings now",
+    "unset": "Not set",
+    "moneyCategoriesSub": "Food, shopping, transit, subscriptions…",
+    "exportSub": "Gig income and money entries, for taxes",
+    "backupValue": "Live sync",
+    "feedbackSoon": "Coming later",
+    "saveError": "Couldn’t save the setting. Please try again."
   },
   "auth": {
     "tagline": "To-dos, plans, habits, gigs and money in one place",
@@ -476,5 +496,70 @@
     "dateSub": "The amount is what you had before this day",
     "net": "Entries since then",
     "result": "Savings now"
+  },
+  "cats": {
+    "tabTask": "To-dos",
+    "tabEvent": "Events",
+    "tabMoney": "Money",
+    "tabsLabel": "Choose which categories to edit",
+    "hintTask": "To-do colors also color the cake layers and the calendar",
+    "hintEvent": "Event colors are used for the bars in the calendar",
+    "hintMoney": "Money categories show in “Add entry” and the monthly totals",
+    "expense": "Spending",
+    "income": "Income",
+    "name": "Name",
+    "color": "Color",
+    "preview": "Preview",
+    "delete": "Delete this category",
+    "deleteHint": "Anything in it becomes “Uncategorized”",
+    "lastOne": "Each kind needs at least one category, so this one can’t be deleted",
+    "add": "Add category",
+    "newName": "New category",
+    "countTasks": "{n} this month",
+    "countEvents": "{n} this month",
+    "edit": "Edit {name}"
+  },
+  "cakes": {
+    "randomWeekly": "Random desserts each week",
+    "randomSub": "Every Monday, seven different desserts are drawn",
+    "randomNote": "Random each week is on; these are this week’s picks",
+    "glitter": "Glitter sound when all done",
+    "glitterSub": "Uses Fairy glitter",
+    "maxLayers": "Most layers in a day",
+    "maxLayersSub": "With more to-dos than this, each category merges into one layer",
+    "layersN": "{n} layers",
+    "pickFor": "Pick the dessert for {day}",
+    "week": "Dessert of the day",
+    "options": "More"
+  },
+  "budget": {
+    "total": "Monthly budget",
+    "allocated": "{amount} allocated",
+    "used": "Used {used} this month ({pct}%), {left} left",
+    "usedOver": "Used {used} this month ({pct}%), {over} over",
+    "byCategory": "Budget by category",
+    "byCategorySub": "Steps of 500; 0 means no limit",
+    "minus": "Lower the {name} budget by {step}",
+    "plus": "Raise the {name} budget by {step}",
+    "left": "{amount} left",
+    "over": "{amount} over",
+    "noLimit": "No limit",
+    "warn": "Warn near the limit",
+    "warnSub": "Shows on the Money page at 80%",
+    "startDay": "Month starts on",
+    "start1": "The 1st",
+    "start5": "Payday, the 5th",
+    "amountAria": "{name} budget amount"
+  },
+  "backup": {
+    "synced": "Everything is synced",
+    "lastSync": "Last synced: {time}",
+    "syncing": "Syncing…",
+    "syncNow": "Sync now",
+    "syncFailed": "Sync failed. Check your connection and try again.",
+    "liveNote": "Every change is saved to the cloud right away, so your phone and computer see the same data when signed in to the same account. Changed something on another device? Tap “Sync now”.",
+    "download": "Download a backup",
+    "downloadSub": "Saves all your data as one JSON file to keep yourself",
+    "downloaded": "Backup downloaded"
   }
 }

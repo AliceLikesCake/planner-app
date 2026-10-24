@@ -11,6 +11,7 @@ import {
   DEFAULT_WEEK,
   DESSERT_HEIGHT,
   isDessertId,
+  weeklyDesserts,
   type DessertId,
 } from '@/components/cake/desserts'
 import { useErrorToast } from '@/composables/useErrorToast'
@@ -40,6 +41,7 @@ const selectedDay = ref(weekdayIndex(today.value))
 watch(today, (key) => (selectedDay.value = weekdayIndex(key)))
 
 function dessertOn(index: number): DessertId {
+  if (settings.row?.cakes_random_weekly) return weeklyDesserts(weekOf(today.value)[0]!)[index]!
   const chosen = settings.row?.cakes_by_weekday[index]
   return isDessertId(chosen) ? chosen : DEFAULT_WEEK[index]!
 }
@@ -116,7 +118,7 @@ async function toggle(item: TaskOccurrence) {
     if (done) {
       const layer = layout.value.done + 1
       void playStack(layer)
-      if (layer === layout.value.total) void playAllDone()
+      if (layer === layout.value.total && settings.row?.cake_glitter !== false) void playAllDone()
     } else {
       playUndo()
     }

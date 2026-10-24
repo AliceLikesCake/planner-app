@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { computeLayers, type CakeTask } from '../components/cake/layers'
-import { buildCake, DESSERT_IDS } from '../components/cake/desserts'
+import { buildCake, DESSERT_IDS, weeklyDesserts } from '../components/cake/desserts'
 
 const COLORS: Record<string, string> = { work: '#BCCDE6', gig: '#D5C8EA', study: '#C6DBB6' }
 
@@ -126,5 +126,16 @@ describe('buildCake', () => {
   it('shows toppings only when everything is done', () => {
     const { segments } = computeLayers([task('a', 'work', '01'), task('b', 'gig')], H)
     expect(buildCake('classic', segments, false).deco).toEqual([])
+  })
+})
+
+describe('weeklyDesserts', () => {
+  it('picks seven different desserts, the same ones for the same week', () => {
+    const a = weeklyDesserts('2026-10-19')
+    expect(a).toHaveLength(7)
+    expect(new Set(a).size).toBe(7)
+    expect(weeklyDesserts('2026-10-19')).toEqual(a)
+    const weeks = ['2026-10-26', '2026-11-02', '2026-11-09'].map((w) => weeklyDesserts(w).join())
+    expect(new Set([a.join(), ...weeks]).size).toBeGreaterThan(1)
   })
 })

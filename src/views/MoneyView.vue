@@ -52,6 +52,10 @@ const usedPct = computed(() =>
   budget.value ? Math.round((summary.value.expense / budget.value) * 100) : 0,
 )
 const left = computed(() => budget.value - summary.value.expense)
+// 快超支提醒 (settings.budget_warn): in-app until push notifications exist.
+const nearLimit = computed(
+  () => (settings.row?.budget_warn ?? true) && left.value >= 0 && usedPct.value >= 80,
+)
 
 // ---- by category ----
 const view = ref<'expense' | 'income'>('expense')
@@ -63,7 +67,7 @@ const ranking = computed(() =>
   (view.value === 'expense' ? summary.value.expenseByCategory : summary.value.incomeByCategory).map(
     (row) => {
       const category = categories.byId(row.categoryId)
-      return { ...row, category, name: categories.name(category) || t('category.other') }
+      return { ...row, category, name: categories.name(category) }
     },
   ),
 )
@@ -117,7 +121,7 @@ const days = computed(() => {
     total: items.reduce((sum, tx) => sum + (tx.type === 'income' ? tx.amount : -tx.amount), 0),
     items: items.map((tx) => {
       const category = categories.byId(tx.category_id)
-      const categoryName = categories.name(category) || t('category.other')
+      const categoryName = categories.name(category)
       return { tx, category, categoryName, name: tx.note || categoryName }
     }),
   }))
@@ -213,10 +217,12 @@ const days = computed(() => {
         <div v-if="budget" class="budget">
           <div class="budget-text num">
             <span>{{ t('money.budgetUsed', { budget: formatMoney(budget), pct: usedPct }) }}</span>
-            <span :class="{ over: left < 0 }">{{
+            <span :class="{ over: left < 0, near: nearLimit }">{{
               left < 0
                 ? t('money.budgetOver', { amount: formatMoney(-left) })
-                : t('money.budgetLeft', { amount: formatMoney(left) })
+                : nearLimit
+                  ? t('money.budgetWarn', { pct: usedPct })
+                  : t('money.budgetLeft', { amount: formatMoney(left) })
             }}</span>
           </div>
           <div class="bar">
@@ -494,6 +500,11 @@ const days = computed(() => {
 
 .over {
   color: var(--overdue-fg);
+  font-weight: 700;
+}
+
+.near {
+  color: var(--peach-text);
   font-weight: 700;
 }
 

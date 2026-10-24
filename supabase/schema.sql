@@ -25,6 +25,7 @@ create table if not exists public.settings (
   cakes_by_weekday jsonb not null default '["classic","crepe","cupcake","sundae","pudding","pancake","tier"]'::jsonb,
   cakes_random_weekly boolean not null default false,
   max_layers smallint not null default 8,
+  cake_glitter boolean not null default true,  -- 全部完成時的閃亮音效 (DECISIONS 48)
   savings_amount integer,          -- 目前存款 at the start of savings_date (DECISIONS 44); null = not used
   savings_date date,               -- entries dated this day or later adjust it
   savings_set_at timestamptz,      -- when it was last entered (shown on the savings page)
@@ -34,6 +35,7 @@ create table if not exists public.settings (
 alter table public.settings add column if not exists savings_amount integer;
 alter table public.settings add column if not exists savings_set_at timestamptz;
 alter table public.settings add column if not exists savings_date date;
+alter table public.settings add column if not exists cake_glitter boolean not null default true;
 
 -- ---------- categories ----------
 create table if not exists public.categories (

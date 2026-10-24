@@ -7,11 +7,14 @@ import {
   createEvent,
   deleteEvent,
   eventDays,
+  rolloverOncePerDay,
+  rolloverTasks,
   syncEventTasks,
   updateEvent,
 } from '../services/sync'
 import { useCategoriesStore } from '../stores/categories'
 import { useEventsStore } from '../stores/events'
+import { useSettingsStore } from '../stores/settings'
 import { useTasksStore } from '../stores/tasks'
 
 vi.mock('@/services/supabase', () => import('./fakeSupabase'))
@@ -178,5 +181,40 @@ describe('rule 7: event → to-dos', () => {
       ['2026-10-24', 'Y'],
       ['2026-10-25', 'Y'],
     ])
+  })
+})
+
+describe('rule 9: unfinished to-dos move to today', () => {
+  it('moves unfinished one-off manual to-dos from before today, nothing else', async () => {
+    const tasks = useTasksStore()
+    const old = await tasks.add({ title: 'old', date: '2026-10-20' })
+    const done = await tasks.add({ title: 'done', date: '2026-10-20', done: true })
+    const daily = await tasks.add({ title: 'daily', date: '2026-10-01', repeat: 'day' })
+    const future = await tasks.add({ title: 'future', date: '2026-10-30' })
+    const generated = await tasks.add({ title: 'gen', date: '2026-10-20', source: 'event' })
+
+    expect(await rolloverTasks('2026-10-24')).toBe(1)
+    const date = (id: string) => tasks.items.find((t) => t.id === id)!.date
+    expect(date(old.id)).toBe('2026-10-24')
+    expect([date(done.id), date(daily.id), date(future.id), date(generated.id)]).toEqual([
+      '2026-10-20',
+      '2026-10-01',
+      '2026-10-30',
+      '2026-10-20',
+    ])
+  })
+
+  it('does nothing when the setting is off, and runs once a day', async () => {
+    const tasks = useTasksStore()
+    await useSettingsStore().update({ rollover_tasks: false })
+    const t1 = await tasks.add({ title: 'old', date: '2026-10-20' })
+    expect(await rolloverTasks('2026-10-24')).toBe(0)
+
+    await useSettingsStore().update({ rollover_tasks: true })
+    localStorage.setItem('planner.rollover.user-1', '2026-10-24')
+    await rolloverOncePerDay('user-1', '2026-10-24')
+    expect(tasks.items.find((t) => t.id === t1.id)!.date).toBe('2026-10-20')
+    await rolloverOncePerDay('user-1', '2026-10-25')
+    expect(tasks.items.find((t) => t.id === t1.id)!.date).toBe('2026-10-25')
   })
 })

@@ -20,6 +20,41 @@ export function calendarTodos(day: DateKey): TaskOccurrence[] {
   return [...list.filter((o) => !o.done), ...list.filter((o) => o.done)]
 }
 
+// ---- Rule 9: unfinished to-dos move to today (setting: 沒做完的自動移到明天) ----
+
+/**
+ * Moves unfinished one-off to-dos dated before today to today. Repeating to-dos stay (each
+ * day is its own), and so do generated ones: their dates come from their event or gig, whose
+ * rules would move them back (DECISIONS 47). Returns how many moved.
+ */
+export async function rolloverTasks(today: DateKey): Promise<number> {
+  if (!(useSettingsStore().row?.rollover_tasks ?? true)) return 0
+  const tasks = useTasksStore()
+  const stale = tasks.items.filter(
+    (task) => !task.done && task.repeat === 'none' && task.source === 'manual' && task.date < today,
+  )
+  for (const task of stale) await tasks.update(task.id, { date: today })
+  return stale.length
+}
+
+const ROLLOVER_KEY = 'planner.rollover.'
+
+/** Runs rule 9 once per user per day: on the first time the app opens that day. */
+export async function rolloverOncePerDay(userId: string, today: DateKey) {
+  const key = ROLLOVER_KEY + userId
+  try {
+    if (localStorage.getItem(key) === today) return
+  } catch {
+    // No storage: running again is harmless, the rule is idempotent.
+  }
+  await rolloverTasks(today)
+  try {
+    localStorage.setItem(key, today)
+  } catch {
+    // ignore
+  }
+}
+
 // ---- Rule 7: an event with "同時加到今日待辦" gets a to-do on each of its days ----
 
 /** Every day an event covers, start to end inclusive. */

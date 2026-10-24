@@ -9,6 +9,8 @@ export type AuthStatus = 'loading' | 'signedOut' | 'ready' | 'error'
 export const useAuthStore = defineStore('auth', () => {
   const status = ref<AuthStatus>('loading')
   const user = ref<User | null>(null)
+  /** When everything was last read from Supabase. */
+  const lastSyncedAt = ref<Date | null>(null)
   let started = false
 
   async function enter(next: User | null) {
@@ -26,7 +28,10 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       await loadUserData(next.id)
       // Ignore a load that finished after the user changed again.
-      if (user.value?.id === next.id) status.value = 'ready'
+      if (user.value?.id === next.id) {
+        status.value = 'ready'
+        lastSyncedAt.value = new Date()
+      }
     } catch (error) {
       console.error(error)
       if (user.value?.id === next.id) status.value = 'error'
@@ -62,5 +67,12 @@ export const useAuthStore = defineStore('auth', () => {
     return enter(user.value)
   }
 
-  return { status, user, init, signInWithGoogle, signOut, retry }
+  /** 立即同步: reads everything again, picking up changes made on another device. */
+  async function syncNow() {
+    if (!user.value) return
+    await loadUserData(user.value.id)
+    lastSyncedAt.value = new Date()
+  }
+
+  return { status, user, lastSyncedAt, init, signInWithGoogle, signOut, retry, syncNow }
 })

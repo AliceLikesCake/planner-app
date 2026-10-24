@@ -25,6 +25,8 @@ export interface SettingsRow {
   cakes_by_weekday: string[]
   cakes_random_weekly: boolean
   max_layers: number
+  /** 全部完成時的閃亮音效 */
+  cake_glitter: boolean
   /** 目前存款 at the start of savings_date; null when not used. */
   savings_amount: number | null
   /** Money entries dated this day or later adjust savings_amount. */

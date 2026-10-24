@@ -424,3 +424,24 @@ export function buildCake(id: DessertId, segments: CakeSegment[], allDone: boole
     cylinder,
   }
 }
+
+/**
+ * 每週隨機換甜點: seven different desserts for the week starting on `monday`, picked from all
+ * ten. The same week always gets the same pick, on every device.
+ */
+export function weeklyDesserts(monday: string): DessertId[] {
+  // mulberry32, seeded from the date
+  let seed = [...monday].reduce((h, ch) => Math.imul(h ^ ch.charCodeAt(0), 16777619), 2166136261)
+  const random = () => {
+    seed = (seed + 0x6d2b79f5) | 0
+    let x = Math.imul(seed ^ (seed >>> 15), 1 | seed)
+    x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x
+    return ((x ^ (x >>> 14)) >>> 0) / 4294967296
+  }
+  const pool: DessertId[] = [...DESSERT_IDS]
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1))
+    ;[pool[i], pool[j]] = [pool[j]!, pool[i]!]
+  }
+  return pool.slice(0, 7)
+}

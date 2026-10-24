@@ -22,7 +22,8 @@ export const useCategoriesStore = defineStore('categories', () => {
 
   /** Name in the current language (SPEC 7: name_zh / name_en). */
   function name(category: CategoryRow | undefined) {
-    if (!category) return ''
+    // A deleted category leaves its rows with category_id null.
+    if (!category) return i18n.global.t('category.none')
     return i18n.global.locale.value === 'en' ? category.name_en : category.name_zh
   }
 

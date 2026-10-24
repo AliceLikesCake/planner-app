@@ -42,17 +42,22 @@ export const useSettingsStore = defineStore('settings', () => {
     if (!(await load(userId))) throw new Error('Settings row missing after create')
   }
 
+  /** Saves a change; switches and pickers show it right away and go back if saving fails. */
   async function update(patch: Partial<Omit<SettingsRow, 'user_id'>>) {
     const current = row.value
     if (!current) throw new Error('Settings not loaded')
     const next = { ...patch, updated_at: new Date().toISOString() }
+    row.value = { ...current, ...next }
     const { data, error } = await supabase
       .from('settings')
       .update(next)
       .eq('user_id', current.user_id)
       .select()
       .single()
-    if (error) throw error
+    if (error) {
+      row.value = current
+      throw error
+    }
     row.value = data as SettingsRow
   }
 

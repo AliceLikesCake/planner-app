@@ -1,5 +1,7 @@
 import { supabase } from './supabase'
 import { defaultCategoryRows } from './defaults'
+import { todayKey } from './dates'
+import { rolloverOncePerDay } from './sync'
 import { useSettingsStore } from '@/stores/settings'
 import { useCategoriesStore } from '@/stores/categories'
 import { useTasksStore } from '@/stores/tasks'
@@ -43,6 +45,8 @@ export async function loadUserData(userId: string) {
     await settings.create(userId)
   }
   await Promise.all(dataStores().map((store) => store.load()))
+  // Rule 9 runs on the first open of the day; a failure here must not block the app.
+  await rolloverOncePerDay(userId, todayKey()).catch((error) => console.error(error))
 }
 
 /** Runs on sign-out so the next account never sees the previous one's rows. */

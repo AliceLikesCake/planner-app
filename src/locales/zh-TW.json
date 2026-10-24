@@ -44,7 +44,8 @@
     "medical": "醫療",
     "subscription": "訂閱",
     "other": "其他",
-    "salary": "薪資"
+    "salary": "薪資",
+    "none": "未分類"
   },
   "product": {
     "beauty": "彩妝",
@@ -210,7 +211,8 @@
     "editSavings": "修改目前存款",
     "detailFilter": "篩選明細：全部、支出或收入",
     "categoryFilter": "依分類篩選明細",
-    "allCategories": "全部分類"
+    "allCategories": "全部分類",
+    "budgetWarn": "已用 {pct}%，快超支了"
   },
   "settings": {
     "title": "設定",
@@ -245,7 +247,25 @@
     "version": "版本 {v}",
     "langZh": "中文",
     "langEn": "English",
-    "accountBackup": "帳號與備份"
+    "accountBackup": "帳號與備份",
+    "darkSub": "之後推出",
+    "categoriesSub": "工作、接案、學習、生活、健康",
+    "rolloverSub": "每天第一次打開 app 時，把以前沒做完的待辦移到今天",
+    "cakesValue": "週一到週日",
+    "cakesSub": "十種甜點，也可以每週隨機換",
+    "soundSub": "疊蛋糕、戳泡泡的聲音",
+    "pushSub": "推播之後推出，現在先記住你的選擇",
+    "remindDeliverSub": "交稿和上線的前一天提醒",
+    "remindOverdueSub": "超過預計入帳日還沒收到款項時提醒",
+    "syncCalendarSub": "交稿、上線、入帳日自動出現在月曆",
+    "syncMoneySub": "標記已入帳時，新增一筆接案收入",
+    "savings": "目前存款",
+    "unset": "未設定",
+    "moneyCategoriesSub": "餐飲、購物、交通、訂閱…",
+    "exportSub": "接案收入和記帳明細，報稅用",
+    "backupValue": "即時同步",
+    "feedbackSoon": "之後開放",
+    "saveError": "設定沒有存到，請再試一次"
   },
   "auth": {
     "tagline": "待辦、行程、習慣、接案和記帳，一個地方搞定",
@@ -476,5 +496,70 @@
     "dateSub": "金額是這天開始前的存款",
     "net": "這段期間的收支",
     "result": "目前存款"
+  },
+  "cats": {
+    "tabTask": "待辦",
+    "tabEvent": "行程",
+    "tabMoney": "記帳",
+    "tabsLabel": "選擇要編輯的類別種類",
+    "hintTask": "待辦的顏色也會用在今日蛋糕的每一層和月曆",
+    "hintEvent": "行程的顏色會用在月曆上的長條",
+    "hintMoney": "記帳分類會出現在「記一筆」和每月統計",
+    "expense": "支出",
+    "income": "收入",
+    "name": "名稱",
+    "color": "顏色",
+    "preview": "預覽",
+    "delete": "刪除這個類別",
+    "deleteHint": "用到這個類別的資料會變成「未分類」",
+    "lastOne": "每一種至少要留一個類別，所以不能刪除",
+    "add": "新增類別",
+    "newName": "新類別",
+    "countTasks": "本月 {n} 件",
+    "countEvents": "本月 {n} 個",
+    "edit": "編輯 {name}"
+  },
+  "cakes": {
+    "randomWeekly": "每週隨機換甜點",
+    "randomSub": "每週一自動抽七種不同的甜點",
+    "randomNote": "目前是每週隨機，下面是這週抽到的甜點",
+    "glitter": "全部完成時的閃亮音效",
+    "glitterSub": "使用 Fairy glitter",
+    "maxLayers": "一天最多疊幾層",
+    "maxLayersSub": "待辦比這個多時，同類別會合併成一層",
+    "layersN": "{n} 層",
+    "pickFor": "選{day}的甜點",
+    "week": "每天的甜點",
+    "options": "其他"
+  },
+  "budget": {
+    "total": "每月總預算",
+    "allocated": "已分配 {amount}",
+    "used": "這個月已用 {used}（{pct}%），還剩 {left}",
+    "usedOver": "這個月已用 {used}（{pct}%），超支 {over}",
+    "byCategory": "各分類預算",
+    "byCategorySub": "每格可以增減 500，設 0 代表不限制",
+    "minus": "{name}預算減少 {step}",
+    "plus": "{name}預算增加 {step}",
+    "left": "剩 {amount}",
+    "over": "超支 {amount}",
+    "noLimit": "不限制",
+    "warn": "快超支提醒",
+    "warnSub": "用到 80% 時在記帳頁提醒",
+    "startDay": "每月起算日",
+    "start1": "1 號",
+    "start5": "發薪日 5 號",
+    "amountAria": "{name}預算金額"
+  },
+  "backup": {
+    "synced": "資料都同步好了",
+    "lastSync": "上次同步：{time}",
+    "syncing": "同步中…",
+    "syncNow": "立即同步",
+    "syncFailed": "同步失敗，請檢查網路後再試一次",
+    "liveNote": "每一次修改都會馬上存到雲端，手機和電腦登入同一個帳號就看得到一樣的資料。在另一台裝置改了東西，按「立即同步」就會更新。",
+    "download": "下載備份檔",
+    "downloadSub": "把所有資料存成一個 JSON 檔，自己另外保存",
+    "downloaded": "已下載備份檔"
   }
 }
