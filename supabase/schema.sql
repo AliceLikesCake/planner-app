@@ -47,7 +47,7 @@ create table if not exists public.gigs (
   user_id uuid not null references auth.users(id) on delete cascade,
   brand text not null,
   product_category text not null check (product_category in ('beauty', 'skin', 'food', 'home', 'tech', 'fashion')),
-  formats text[] not null default '{}',   -- ig_post, ig_reels, story, youtube, blog
+  formats text[] not null default '{}',   -- ig_post, ig_reels, story, threads, youtube
   amount integer not null default 0,      -- before tax, TWD
   contact text,
   note text,

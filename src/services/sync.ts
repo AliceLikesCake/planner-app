@@ -1,10 +1,14 @@
 // Cross-module sync rules (SPEC section 6). Pages call these functions; components hold no
 // sync logic. Every rule is idempotent: running it twice leaves the same rows.
-import { addDays, type DateKey } from './dates'
+import { addDays, todayKey, type DateKey } from './dates'
+import { i18n } from '@/i18n'
 import { useCategoriesStore } from '@/stores/categories'
 import { useEventsStore, type NewEvent } from '@/stores/events'
+import { useGigsStore, type NewGig } from '@/stores/gigs'
+import { useMoneyStore, type NewTransaction } from '@/stores/money'
+import { useSettingsStore } from '@/stores/settings'
 import { useTasksStore, type TaskOccurrence } from '@/stores/tasks'
-import type { CategoryRow, EventRow, TaskRow } from '@/types/db'
+import type { CategoryRow, EventRow, GigRow, TaskRow, TransactionRow } from '@/types/db'
 
 // ---- Rule 6: to-dos with a date show on that day in the calendar (read directly, no copies) ----
 
@@ -95,4 +99,258 @@ export async function updateEvent(id: string, patch: Partial<NewEvent>): Promise
 export async function deleteEvent(id: string) {
   await useEventsStore().remove(id)
   useTasksStore().forget((t) => t.event_id === id)
+}
+
+// ---- Rules 1–5: gigs → calendar, to-dos and money; money → gigs ----
+
+const t = (key: string, values: Record<string, unknown>) => i18n.global.t(key, values)
+
+const categoryByKey = (type: CategoryRow['type'], key: string) =>
+  useCategoriesStore()
+    .ofType(type)
+    .find((c) => c.key === key)
+
+type GigEventKind = NonNullable<EventRow['gig_kind']>
+type GigTaskKind = NonNullable<TaskRow['gig_kind']>
+
+/** Rule 1: one all-day event per filled-in date (交稿 / 上線 / 預計入帳). */
+async function syncGigEvents(gig: GigRow) {
+  const events = useEventsStore()
+  const enabled = (useSettingsStore().row?.auto_sync_calendar ?? true) && gig.sync_calendar
+  const dates: Record<GigEventKind, string | null> = {
+    deliver: gig.deliver_date,
+    live: gig.live_date,
+    due: gig.due_date,
+  }
+  const titles: Record<GigEventKind, string> = {
+    deliver: 'gigs.eventDeliver',
+    live: 'gigs.eventLive',
+    due: 'gigs.eventDue',
+  }
+  const categoryId = categoryByKey('event', 'gig')?.id ?? null
+
+  for (const kind of ['deliver', 'live', 'due'] as const) {
+    const existing = events.items.find(
+      (e) => e.gig_id === gig.id && e.gig_kind === kind && e.source === 'gig',
+    )
+    const date = enabled ? dates[kind] : null
+    if (!date) {
+      if (existing) await events.remove(existing.id)
+      continue
+    }
+    const fields = {
+      title: t(titles[kind], { brand: gig.brand }),
+      start_date: date,
+      end_date: date,
+      category_id: categoryId,
+    }
+    if (!existing) {
+      await events.add({ ...fields, all_day: true, source: 'gig', gig_id: gig.id, gig_kind: kind })
+    } else if (
+      existing.title !== fields.title ||
+      existing.start_date !== date ||
+      existing.end_date !== date
+    ) {
+      await events.update(existing.id, fields)
+    }
+  }
+}
+
+/** Creates, updates or removes one generated to-do of a gig. */
+async function upsertGigTask(
+  gig: GigRow,
+  kind: GigTaskKind,
+  want: { title: string; date: DateKey; done?: boolean } | null,
+) {
+  const tasks = useTasksStore()
+  const existing = tasks.items.find(
+    (task) => task.gig_id === gig.id && task.gig_kind === kind && task.source === 'gig',
+  )
+  if (!want) {
+    if (existing) await tasks.remove(existing.id)
+    return
+  }
+  const doneFields =
+    want.done === undefined
+      ? {}
+      : {
+          done: want.done,
+          done_at: want.done ? (existing?.done_at ?? new Date().toISOString()) : null,
+        }
+  if (!existing) {
+    await tasks.add({
+      title: want.title,
+      date: want.date,
+      category_id: categoryByKey('task', 'gig')?.id ?? null,
+      source: 'gig',
+      gig_id: gig.id,
+      gig_kind: kind,
+      ...doneFields,
+    })
+    return
+  }
+  const patch: Partial<TaskRow> = {}
+  if (existing.title !== want.title) patch.title = want.title
+  if (existing.date !== want.date) patch.date = want.date
+  if (want.done !== undefined && existing.done !== want.done) Object.assign(patch, doneFields)
+  if (Object.keys(patch).length) await tasks.update(existing.id, patch)
+}
+
+/**
+ * Rule 2: "準備交稿" the day before delivery and "確認上線" on the live day.
+ * Rule 3: one "簽合約／勞報單" to-do (DECISIONS 5), done once both are signed.
+ * Ticking 交稿 / 上線 on the Gigs page ticks the matching to-do (DECISIONS 26).
+ */
+async function syncGigTasks(gig: GigRow, before?: GigRow) {
+  const changed = (key: 'delivered' | 'is_live') => !before || before[key] !== gig[key]
+
+  await upsertGigTask(
+    gig,
+    'prep_deliver',
+    gig.sync_todo && gig.deliver_date
+      ? {
+          title: t('gigs.taskPrep', { brand: gig.brand }),
+          date: addDays(gig.deliver_date, -1),
+          done: changed('delivered') ? gig.delivered : undefined,
+        }
+      : null,
+  )
+  await upsertGigTask(
+    gig,
+    'check_live',
+    gig.sync_todo && gig.live_date
+      ? {
+          title: t('gigs.taskCheckLive', { brand: gig.brand }),
+          date: gig.live_date,
+          done: changed('is_live') ? gig.is_live : undefined,
+        }
+      : null,
+  )
+
+  const missing = [
+    !gig.contract_signed && t('gigs.docContract', {}),
+    !gig.labor_signed && t('gigs.docLabor', {}),
+  ].filter(Boolean)
+  const tasks = useTasksStore()
+  const existing = tasks.items.find(
+    (task) => task.gig_id === gig.id && task.gig_kind === 'sign_docs' && task.source === 'gig',
+  )
+  if (!gig.sync_docs || (!existing && !missing.length)) {
+    await upsertGigTask(gig, 'sign_docs', null)
+    return
+  }
+  const allSigned = !missing.length
+  // Shows up tomorrow; reopening a finished one moves it to tomorrow again.
+  const date = !existing || (existing.done && !allSigned) ? addDays(todayKey(), 1) : existing.date
+  const docs = allSigned
+    ? [t('gigs.docContract', {}), t('gigs.docLabor', {})]
+    : (missing as string[])
+  await upsertGigTask(gig, 'sign_docs', {
+    title: t('gigs.taskSign', { brand: gig.brand, docs: docs.join(t('gigs.docsJoin', {})) }),
+    date,
+    done: allSigned,
+  })
+}
+
+/** The income entry recorded for a gig, if any (one per gig: transactions_gig_uniq). */
+export function gigIncome(gigId: string): TransactionRow | undefined {
+  return useMoneyStore().items.find((tx) => tx.gig_id === gigId)
+}
+
+/** Rule 4: marking a gig paid records the income; marking it unpaid again removes it. */
+async function syncGigIncome(gig: GigRow, before?: GigRow) {
+  const enabled = (useSettingsStore().row?.auto_sync_money ?? true) && gig.sync_money
+  if (!enabled) return
+  const money = useMoneyStore()
+  const existing = gigIncome(gig.id)
+
+  if (!gig.paid_at) {
+    if (existing) await money.remove(existing.id)
+    return
+  }
+  if (!existing) {
+    await money.add({
+      type: 'income',
+      amount: gig.amount,
+      date: gig.paid_at,
+      category_id: categoryByKey('income', 'gig')?.id ?? null,
+      gig_id: gig.id,
+      note: gig.brand,
+    })
+    return
+  }
+  const patch: Partial<TransactionRow> = {}
+  if (existing.date !== gig.paid_at) patch.date = gig.paid_at
+  // Follow the gig's amount unless the entry was changed by hand (DECISIONS 27).
+  if (before && before.amount !== gig.amount && existing.amount === before.amount) {
+    patch.amount = gig.amount
+  }
+  if (Object.keys(patch).length) await money.update(existing.id, patch)
+}
+
+/** Runs rules 1–4 for one gig. Idempotent. */
+export async function syncGig(gig: GigRow, before?: GigRow) {
+  await syncGigEvents(gig)
+  await syncGigTasks(gig, before)
+  await syncGigIncome(gig, before)
+}
+
+export async function createGig(row: NewGig): Promise<GigRow> {
+  const gig = await useGigsStore().add(row)
+  await syncGig(gig)
+  return gig
+}
+
+/**
+ * Saves a change to a gig (the card's step circles, or the edit form) and runs the rules.
+ * The card updates right away and goes back if saving fails.
+ */
+export async function updateGig(id: string, patch: Partial<NewGig>): Promise<GigRow> {
+  const gigs = useGigsStore()
+  const index = gigs.items.findIndex((g) => g.id === id)
+  const before = gigs.items[index]
+  if (before) gigs.items[index] = { ...before, ...patch }
+  let gig: GigRow
+  try {
+    gig = await gigs.update(id, { ...patch, updated_at: new Date().toISOString() })
+  } catch (error) {
+    if (before) gigs.items[index] = before
+    throw error
+  }
+  await syncGig(gig, before)
+  return gig
+}
+
+/**
+ * Deletes a gig with its generated events and to-dos (the database cascades them).
+ * To-dos the user made and only linked to the gig stay, unlinked. The income entry goes
+ * only when `deleteIncome` is set; otherwise it stays as a plain income.
+ */
+export async function deleteGig(id: string, { deleteIncome }: { deleteIncome: boolean }) {
+  const tasks = useTasksStore()
+  const money = useMoneyStore()
+  for (const task of tasks.items.filter((x) => x.gig_id === id && x.source !== 'gig')) {
+    await tasks.update(task.id, { gig_id: null })
+  }
+  const income = gigIncome(id)
+  if (income && deleteIncome) await money.remove(income.id)
+
+  await useGigsStore().remove(id)
+  useEventsStore().forget((e) => e.gig_id === id)
+  tasks.forget((x) => x.gig_id === id)
+  const kept = gigIncome(id)
+  if (kept) {
+    const index = money.items.indexOf(kept)
+    money.items[index] = { ...kept, gig_id: null }
+  }
+}
+
+/** Rule 5: an income entry filed under 接案 with a gig picked marks that gig paid on its date. */
+export async function recordIncome(row: NewTransaction): Promise<TransactionRow> {
+  const tx = await useMoneyStore().add(row)
+  if (tx.type === 'income' && tx.gig_id) {
+    const gig = useGigsStore().items.find((g) => g.id === tx.gig_id)
+    if (gig && gig.paid_at !== tx.date) await updateGig(gig.id, { paid_at: tx.date })
+  }
+  return tx
 }

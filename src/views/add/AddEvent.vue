@@ -30,7 +30,9 @@ function leave() {
   else router.replace('/calendar')
 }
 
-if (props.id && !existing) router.replace('/calendar')
+// A gig's dates live on the gig (rule 1 keeps the events in step).
+if (existing?.source === 'gig' && existing.gig_id) router.replace(`/edit/gig/${existing.gig_id}`)
+else if (props.id && !existing) router.replace('/calendar')
 
 const title = ref(existing?.title ?? '')
 const categoryId = ref(existing ? existing.category_id : (eventCategories.value[0]?.id ?? null))

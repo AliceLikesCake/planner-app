@@ -9,8 +9,9 @@ import { calendarTodos, eventDays } from '@/services/sync'
 import { useCategoriesStore } from '@/stores/categories'
 import { useEventsStore } from '@/stores/events'
 import { useSettingsStore } from '@/stores/settings'
+import { GIG_EVENT_COLORS, GIG_EVENT_LABELS } from '@/services/products'
 import { paletteVars } from '@/styles/palette'
-import type { EventRow } from '@/types/db'
+import type { CategoryRow, EventRow } from '@/types/db'
 
 const { t, locale } = useI18n()
 const today = useToday()
@@ -44,15 +45,31 @@ const title = computed(() => {
 })
 
 // ---- category filter ----
+// One chip per kind of category across events and to-dos: an event category and a to-do
+// category with the same key (工作, 接案, …) share a chip, so 生活 shows up too (DECISIONS 35).
+const FILTER_ORDER = ['work', 'gig', 'study', 'life', 'health', 'date', 'travel']
+const groupOf = (c: CategoryRow | undefined) => (c ? (c.key ?? c.id) : 'none')
+
 const filter = ref<string>('all')
-const eventCategories = computed(() => categories.ofType('event'))
-const filters = computed(() => [
-  { id: 'all', label: t('common.all'), color: null },
-  ...eventCategories.value.map((c) => ({ id: c.id, label: categories.name(c), color: c.color })),
-])
-const shownEvents = computed(() =>
-  events.items.filter((e) => filter.value === 'all' || e.category_id === filter.value),
-)
+const filters = computed(() => {
+  const groups = new Map<string, { id: string; label: string; color: string }>()
+  for (const c of [...categories.ofType('event'), ...categories.ofType('task')]) {
+    const id = groupOf(c)
+    if (!groups.has(id)) groups.set(id, { id, label: categories.name(c), color: c.color })
+  }
+  const rank = (id: string) => {
+    const i = FILTER_ORDER.indexOf(id)
+    return i === -1 ? FILTER_ORDER.length : i
+  }
+  return [
+    { id: 'all', label: t('common.all'), color: null as string | null },
+    ...[...groups.values()].sort((a, b) => rank(a.id) - rank(b.id)),
+  ]
+})
+const matches = (categoryId: string | null) =>
+  filter.value === 'all' || groupOf(categories.byId(categoryId)) === filter.value
+
+const shownEvents = computed(() => events.items.filter((e) => matches(e.category_id)))
 
 // ---- grid ----
 const weekStart = computed(() => settings.row?.week_start ?? 'mon')
@@ -65,13 +82,24 @@ const weekdays = computed(() => {
   return Array.from({ length: 7 }, (_, i) => fmt.format(new Date(2026, 9, 4 + offset + i)))
 })
 
+/** A gig's events are colored by kind (交稿 / 上線 / 入帳); other events by their category. */
+function eventColor(e: EventRow) {
+  if (e.source === 'gig' && e.gig_kind) return GIG_EVENT_COLORS[e.gig_kind]
+  return categories.byId(e.category_id)?.color ?? 'sand'
+}
+
+function eventLabel(e: EventRow) {
+  if (e.source === 'gig' && e.gig_kind) return t(GIG_EVENT_LABELS[e.gig_kind])
+  return categories.name(categories.byId(e.category_id))
+}
+
 const gridEvents = computed<CalendarEvent[]>(() =>
   shownEvents.value.map((e) => ({
     id: e.id,
     start: e.start_date,
     end: e.end_date,
     title: e.title,
-    color: categories.byId(e.category_id)?.color ?? 'sand',
+    color: eventColor(e),
   })),
 )
 const weeks = computed(() =>
@@ -120,12 +148,13 @@ const dayEvents = computed(() =>
           : 1,
     )
     .map((e) => {
-      const category = categories.byId(e.category_id)
-      return { event: e, meta: eventMeta(e), category, name: categories.name(category) }
+      return { event: e, meta: eventMeta(e), color: eventColor(e), name: eventLabel(e) }
     }),
 )
 
-const todos = computed(() => calendarTodos(selected.value))
+const todos = computed(() =>
+  calendarTodos(selected.value).filter((o) => matches(o.task.category_id)),
+)
 const todoDone = computed(() => todos.value.filter((o) => o.done).length)
 const isPast = computed(() => selected.value < today.value)
 </script>
@@ -212,9 +241,13 @@ const isPast = computed(() => selected.value < today.value)
         <RouterLink
           v-for="item in dayEvents"
           :key="item.event.id"
-          :to="`/edit/event/${item.event.id}`"
+          :to="
+            item.event.source === 'gig' && item.event.gig_id
+              ? `/edit/gig/${item.event.gig_id}`
+              : `/edit/event/${item.event.id}`
+          "
           class="event"
-          :style="paletteVars(item.category?.color)"
+          :style="paletteVars(item.color)"
         >
           <span class="event-bar" />
           <span class="event-text">

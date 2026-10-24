@@ -31,9 +31,11 @@ function leave() {
   else router.replace('/')
 }
 
-// A to-do made from an event is edited through its event (rule 7 keeps them in step).
+// A generated to-do is edited through its source (rules 2, 3 and 7 keep them in step).
 if (existing?.source === 'event' && existing.event_id) {
   router.replace(`/edit/event/${existing.event_id}`)
+} else if (existing?.source === 'gig' && existing.gig_id) {
+  router.replace(`/edit/gig/${existing.gig_id}`)
 } else if (props.id && !existing) {
   router.replace('/')
 }
