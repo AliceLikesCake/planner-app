@@ -25,8 +25,15 @@ create table if not exists public.settings (
   cakes_by_weekday jsonb not null default '["classic","crepe","cupcake","sundae","pudding","pancake","tier"]'::jsonb,
   cakes_random_weekly boolean not null default false,
   max_layers smallint not null default 8,
+  savings_amount integer,          -- 目前存款 at the start of savings_date (DECISIONS 44); null = not used
+  savings_date date,               -- entries dated this day or later adjust it
+  savings_set_at timestamptz,      -- when it was last entered (shown on the savings page)
   updated_at timestamptz not null default now()
 );
+-- Columns added after the first release, for databases created from an older schema.sql.
+alter table public.settings add column if not exists savings_amount integer;
+alter table public.settings add column if not exists savings_set_at timestamptz;
+alter table public.settings add column if not exists savings_date date;
 
 -- ---------- categories ----------
 create table if not exists public.categories (

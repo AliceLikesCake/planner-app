@@ -183,7 +183,8 @@
     },
     "noFormat": "合作形式未填",
     "payFilter": "付款狀態",
-    "catFilter": "產品類別"
+    "catFilter": "產品類別",
+    "export": "匯出 Excel"
   },
   "money": {
     "title": "記帳",
@@ -195,7 +196,21 @@
     "total": "共 {amount}",
     "detail": "明細",
     "export": "匯出 Excel",
-    "addEntry": "記一筆"
+    "addEntry": "記一筆",
+    "prevMonth": "上個月",
+    "nextMonth": "下個月",
+    "budgetOver": "超支 {amount}",
+    "empty": "這個月還沒有記帳，按右下角的 ＋ 記一筆",
+    "emptyType": "這個月還沒有{type}",
+    "viewLabel": "看支出或收入",
+    "editEntry": "編輯：{name}",
+    "savings": "目前存款",
+    "setSavings": "設定目前存款",
+    "setSavingsSub": "輸入你現在總共有多少錢，之後自動加減收支",
+    "editSavings": "修改目前存款",
+    "detailFilter": "篩選明細：全部、支出或收入",
+    "categoryFilter": "依分類篩選明細",
+    "allCategories": "全部分類"
   },
   "settings": {
     "title": "設定",
@@ -374,5 +389,92 @@
     "deleteIncome": "同時刪除記帳裡的這筆收入（{amount}）",
     "deleteIncomeSub": "關掉的話，那筆收入會留著，只是不再連到接案",
     "amountAria": "金額，新台幣"
+  },
+  "addMoney": {
+    "amount": "金額",
+    "whichGig": "是哪個接案的款項？",
+    "noGigs": "目前沒有待入帳的接案",
+    "noGig": "不指定",
+    "gigSync": "接案頁的「{brand}」會自動改成已入帳",
+    "gigNote": "{brand} 接案款",
+    "notePlaceholder": "例如：午餐便當",
+    "keyDelete": "刪除一位數",
+    "syncDetail": "記帳頁 {date} 的明細，和{category}的分類統計",
+    "syncBudget": "本月預算已用的金額",
+    "editEntry": "編輯這筆",
+    "deleteEntry": "刪除這筆",
+    "deleteGigHint": "接案頁的入帳狀態不會改變"
+  },
+  "export": {
+    "title": "匯出 Excel",
+    "range": "時間範圍",
+    "rangeMonth": "本月",
+    "rangeLast": "上個月",
+    "rangeYear": "今年",
+    "rangeCustom": "自訂",
+    "from": "開始",
+    "to": "結束",
+    "contents": "要匯出的內容",
+    "format": "檔案格式",
+    "excel": "Excel",
+    "csv": "CSV",
+    "count": "{n} 筆",
+    "sheets": "{n} 個工作表",
+    "rows": "共 {n} 筆",
+    "pickOne": "請至少選一項內容",
+    "csvFiles": "每項內容一個 CSV 檔",
+    "button": "匯出",
+    "again": "再匯出一次",
+    "done": "已匯出，檔案存在「下載」資料夾",
+    "failed": "匯出失敗，請再試一次",
+    "fileBase": "我的紀錄",
+    "item": {
+      "money": "記帳明細",
+      "gigs": "接案收入"
+    },
+    "itemSub": {
+      "money": "日期、分類、金額、備註",
+      "gigs": "品牌、金額、入帳日、合約與勞報單狀態，報稅用"
+    },
+    "sheet": {
+      "money": "記帳明細",
+      "gigs": "接案收入"
+    },
+    "col": {
+      "date": "日期",
+      "type": "收支",
+      "category": "分類",
+      "amount": "金額",
+      "note": "備註",
+      "gig": "接案",
+      "brand": "品牌",
+      "product": "產品類別",
+      "formats": "合作形式",
+      "fee": "合作金額（稅前）",
+      "deliver": "交稿日",
+      "live": "上線日",
+      "due": "預計入帳日",
+      "paidAt": "入帳日",
+      "payStatus": "入帳狀態",
+      "contract": "合約已簽",
+      "labor": "勞報單已簽",
+      "delivered": "已交稿",
+      "isLive": "已上線",
+      "contact": "聯絡窗口"
+    },
+    "yes": "是",
+    "no": "否"
+  },
+  "savings": {
+    "title": "目前存款",
+    "hint": "輸入某一天開始前你總共有多少錢（現金、銀行帳戶加起來）。那天和之後記的每一筆收入會自動加上去、支出會扣掉。",
+    "adjust": "數字對不上時（例如有筆錢忘了記），把日期改成今天、重新輸入現在的金額就會校正。",
+    "amount": "目前存款金額",
+    "clear": "不使用目前存款",
+    "clearHint": "記帳頁就不再顯示目前存款",
+    "date": "從哪天開始算",
+    "dateSub": "金額是這天開始前的存款",
+    "net": "這段期間的收支",
+    "result": "目前存款"
   }
 }

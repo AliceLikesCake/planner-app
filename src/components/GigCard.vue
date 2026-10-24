@@ -2,12 +2,11 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { fromKey } from '@/services/dates'
+import { GIG_STEPS, isStepDone, type GigStep } from '@/services/gigSteps'
 import { formatMoney } from '@/services/money'
 import { knownFormats, product } from '@/services/products'
 import { paletteVars } from '@/styles/palette'
 import type { GigRow } from '@/types/db'
-
-export type GigStep = 'contract' | 'labor' | 'delivered' | 'live' | 'paid'
 
 const props = defineProps<{ gig: GigRow; today: string }>()
 defineEmits<{ step: [step: GigStep] }>()
@@ -46,26 +45,21 @@ const payText = computed(() => {
 })
 
 // 合約 → 勞報單 → 交稿 → 上線 → 入帳 (SPEC 4.4)
-const steps = computed(() => {
-  const g = props.gig
-  const on: Record<GigStep, boolean> = {
-    contract: g.contract_signed,
-    labor: g.labor_signed,
-    delivered: g.delivered,
-    live: g.is_live,
-    paid: paid.value,
-  }
-  return (Object.keys(on) as GigStep[]).map((key) => ({
-    key,
-    on: on[key],
-    late: key === 'paid' && overdue.value,
-    label: t(`gigs.steps.${key}`),
-    aria: t('gigs.stepAria', {
-      step: t(`gigs.steps.${key}`),
-      state: t(on[key] ? `gigs.stepOn.${key}` : `gigs.stepOff.${key}`),
-    }),
-  }))
-})
+const steps = computed(() =>
+  GIG_STEPS.map((key) => {
+    const on = isStepDone(props.gig, key)
+    return {
+      key,
+      on,
+      late: key === 'paid' && overdue.value,
+      label: t(`gigs.steps.${key}`),
+      aria: t('gigs.stepAria', {
+        step: t(`gigs.steps.${key}`),
+        state: t(on ? `gigs.stepOn.${key}` : `gigs.stepOff.${key}`),
+      }),
+    }
+  }),
+)
 </script>
 
 <template>

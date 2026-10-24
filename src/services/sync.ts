@@ -345,12 +345,26 @@ export async function deleteGig(id: string, { deleteIncome }: { deleteIncome: bo
   }
 }
 
-/** Rule 5: an income entry filed under 接案 with a gig picked marks that gig paid on its date. */
-export async function recordIncome(row: NewTransaction): Promise<TransactionRow> {
+/** Rule 5: an income filed under 接案 with a gig picked marks that gig paid on its date. */
+async function markLinkedGigPaid(tx: TransactionRow) {
+  if (tx.type !== 'income' || !tx.gig_id) return
+  const gig = useGigsStore().items.find((g) => g.id === tx.gig_id)
+  if (gig && gig.paid_at !== tx.date) await updateGig(gig.id, { paid_at: tx.date })
+}
+
+/** Records a money entry (the 記一筆 screen), running rule 5. */
+export async function recordTransaction(row: NewTransaction): Promise<TransactionRow> {
   const tx = await useMoneyStore().add(row)
-  if (tx.type === 'income' && tx.gig_id) {
-    const gig = useGigsStore().items.find((g) => g.id === tx.gig_id)
-    if (gig && gig.paid_at !== tx.date) await updateGig(gig.id, { paid_at: tx.date })
-  }
+  await markLinkedGigPaid(tx)
+  return tx
+}
+
+/** Saves an edited money entry, running rule 5 again (a new gig or date). */
+export async function updateTransaction(
+  id: string,
+  patch: Partial<NewTransaction>,
+): Promise<TransactionRow> {
+  const tx = await useMoneyStore().update(id, patch)
+  await markLinkedGigPaid(tx)
   return tx
 }

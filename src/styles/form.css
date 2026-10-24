@@ -225,7 +225,12 @@
   font-size: 15px;
 }
 
+/* Sits at the top of the form and stays in view while scrolling, so a failed save is never
+   hidden below the fold or behind the number pad. */
 .form .error {
+  position: sticky;
+  top: 0;
+  z-index: 5;
   margin: 0;
   padding: 12px 16px;
   border-radius: 16px;

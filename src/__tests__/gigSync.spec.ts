@@ -3,7 +3,15 @@ import { createPinia, setActivePinia } from 'pinia'
 import { fakeDb } from './fakeSupabase'
 import { loadUserData } from '../services/session'
 import { addDays, todayKey } from '../services/dates'
-import { createGig, deleteGig, gigIncome, recordIncome, syncGig, updateGig } from '../services/sync'
+import {
+  createGig,
+  deleteGig,
+  gigIncome,
+  recordTransaction,
+  syncGig,
+  updateGig,
+  updateTransaction,
+} from '../services/sync'
 import { useCategoriesStore } from '../stores/categories'
 import { useEventsStore } from '../stores/events'
 import { useGigsStore } from '../stores/gigs'
@@ -165,7 +173,7 @@ describe('rule 4: gig paid → money', () => {
 describe('rule 5: money → gig', () => {
   it('an income filed under a gig marks it paid on that date, without a second entry', async () => {
     const gig = await createGig(full)
-    await recordIncome({
+    await recordTransaction({
       type: 'income',
       amount: 7800,
       date: '2026-10-20',
@@ -200,5 +208,27 @@ describe('deleting a gig', () => {
     const gig = await createGig({ ...full, paid_at: '2026-10-24' })
     await deleteGig(gig.id, { deleteIncome: true })
     expect(useMoneyStore().items).toHaveLength(0)
+  })
+})
+
+describe('rule 5 on edit', () => {
+  it('editing an entry to point at a gig marks that gig paid; expenses never do', async () => {
+    const gig = await createGig(full)
+    const expense = await recordTransaction({
+      type: 'expense',
+      amount: 120,
+      date: '2026-10-21',
+      gig_id: null,
+    })
+    expect(useGigsStore().items[0]!.paid_at).toBeNull()
+
+    const income = await recordTransaction({ type: 'income', amount: 8000, date: '2026-10-22' })
+    await updateTransaction(income.id, { gig_id: gig.id })
+    expect(useGigsStore().items[0]!.paid_at).toBe('2026-10-22')
+    expect(
+      useMoneyStore()
+        .items.map((t) => t.id)
+        .sort(),
+    ).toEqual([expense.id, income.id].sort())
   })
 })

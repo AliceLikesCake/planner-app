@@ -151,6 +151,8 @@ async function save() {
     />
 
     <form class="page-body form" @submit.prevent="save">
+      <p v-if="failed" class="error" role="alert">{{ t('today.saveError') }}</p>
+
       <div class="card field">
         <label for="task-title" class="field-label">{{ t('addTask.what') }}</label>
         <input
@@ -277,8 +279,6 @@ async function save() {
         :busy="saving"
         @confirm="remove"
       />
-
-      <p v-if="failed" class="error" role="alert">{{ t('today.saveError') }}</p>
     </form>
   </main>
 </template>

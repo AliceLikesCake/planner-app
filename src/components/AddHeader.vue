@@ -17,7 +17,9 @@ function cancel() {
 <template>
   <header class="add-header">
     <button type="button" class="text-btn" @click="cancel">{{ t('common.cancel') }}</button>
-    <h1 class="title">{{ title }}</h1>
+    <slot name="title"
+      ><h1 class="title">{{ title }}</h1></slot
+    >
     <button type="button" class="save-btn" :disabled="!canSave" @click="emit('save')">
       {{ t('common.save') }}
     </button>

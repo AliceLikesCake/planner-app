@@ -118,6 +118,8 @@ async function remove() {
     />
 
     <form class="page-body form" @submit.prevent="save">
+      <p v-if="failed" class="error" role="alert">{{ t('today.saveError') }}</p>
+
       <div class="preview">
         <Bubble
           :name="name.trim() || t('addHabit.namePlaceholder')"
@@ -229,8 +231,6 @@ async function remove() {
         :busy="saving"
         @confirm="remove"
       />
-
-      <p v-if="failed" class="error" role="alert">{{ t('today.saveError') }}</p>
     </form>
   </main>
 </template>

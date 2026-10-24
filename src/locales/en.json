@@ -183,7 +183,8 @@
     },
     "noFormat": "No format set",
     "payFilter": "Payment status",
-    "catFilter": "Product category"
+    "catFilter": "Product category",
+    "export": "Export Excel"
   },
   "money": {
     "title": "Money",
@@ -195,7 +196,21 @@
     "total": "Total {amount}",
     "detail": "Entries",
     "export": "Export Excel",
-    "addEntry": "Add entry"
+    "addEntry": "Add entry",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month",
+    "budgetOver": "{amount} over",
+    "empty": "Nothing logged this month. Tap ＋ to add an entry.",
+    "emptyType": "No {type} this month",
+    "viewLabel": "Show spending or income",
+    "editEntry": "Edit: {name}",
+    "savings": "Savings now",
+    "setSavings": "Set your savings",
+    "setSavingsSub": "Enter what you have now; entries adjust it from then on",
+    "editSavings": "Change savings",
+    "detailFilter": "Filter entries: all, spending or income",
+    "categoryFilter": "Filter entries by category",
+    "allCategories": "All categories"
   },
   "settings": {
     "title": "Settings",
@@ -374,5 +389,92 @@
     "deleteIncome": "Also delete its income entry ({amount})",
     "deleteIncomeSub": "If off, the entry stays as a plain income",
     "amountAria": "Amount in NT dollars"
+  },
+  "addMoney": {
+    "amount": "Amount",
+    "whichGig": "Which gig is this from?",
+    "noGigs": "No unpaid gigs right now",
+    "noGig": "None",
+    "gigSync": "“{brand}” will be marked paid on the Gigs page",
+    "gigNote": "{brand} gig payment",
+    "notePlaceholder": "e.g. Lunch box",
+    "keyDelete": "Delete a digit",
+    "syncDetail": "Entries on {date}, and the {category} total on the Money page",
+    "syncBudget": "This month’s budget used",
+    "editEntry": "Edit entry",
+    "deleteEntry": "Delete this entry",
+    "deleteGigHint": "The gig stays marked as paid"
+  },
+  "export": {
+    "title": "Export Excel",
+    "range": "Date range",
+    "rangeMonth": "This month",
+    "rangeLast": "Last month",
+    "rangeYear": "This year",
+    "rangeCustom": "Custom",
+    "from": "From",
+    "to": "To",
+    "contents": "What to export",
+    "format": "File format",
+    "excel": "Excel",
+    "csv": "CSV",
+    "count": "{n} rows",
+    "sheets": "{n} sheets",
+    "rows": "{n} rows in all",
+    "pickOne": "Pick at least one",
+    "csvFiles": "One CSV file per item",
+    "button": "Export",
+    "again": "Export again",
+    "done": "Exported. The file is in your Downloads.",
+    "failed": "Export failed. Please try again.",
+    "fileBase": "My records",
+    "item": {
+      "money": "Money entries",
+      "gigs": "Gig income"
+    },
+    "itemSub": {
+      "money": "Date, category, amount, note",
+      "gigs": "Brand, fee, paid date, contract and labor form status, for taxes"
+    },
+    "sheet": {
+      "money": "Money",
+      "gigs": "Gig income"
+    },
+    "col": {
+      "date": "Date",
+      "type": "Type",
+      "category": "Category",
+      "amount": "Amount",
+      "note": "Note",
+      "gig": "Gig",
+      "brand": "Brand",
+      "product": "Product category",
+      "formats": "Formats",
+      "fee": "Fee (before tax)",
+      "deliver": "Delivery",
+      "live": "Goes live",
+      "due": "Payment due",
+      "paidAt": "Paid on",
+      "payStatus": "Payment status",
+      "contract": "Contract signed",
+      "labor": "Labor form signed",
+      "delivered": "Delivered",
+      "isLive": "Live",
+      "contact": "Contact"
+    },
+    "yes": "Yes",
+    "no": "No"
+  },
+  "savings": {
+    "title": "Savings now",
+    "hint": "Enter how much you had before a given day started (cash and bank accounts together). Every income from that day on is added and every spending is taken off.",
+    "adjust": "If it drifts (say a payment you forgot to log), set the day to today and enter what you have now.",
+    "amount": "Savings amount",
+    "clear": "Stop tracking savings",
+    "clearHint": "The Money page stops showing it",
+    "date": "Count from",
+    "dateSub": "The amount is what you had before this day",
+    "net": "Entries since then",
+    "result": "Savings now"
   }
 }

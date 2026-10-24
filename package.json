@@ -20,7 +20,8 @@
     "pinia": "^4.0.3",
     "vue": "^3.5.42",
     "vue-i18n": "^11.4.16",
-    "vue-router": "^5.3.1"
+    "vue-router": "^5.3.1",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
     "@tsconfig/node24": "^24.0.5",

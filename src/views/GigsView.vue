@@ -2,9 +2,10 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ErrorToast from '@/components/ErrorToast.vue'
-import GigCard, { type GigStep } from '@/components/GigCard.vue'
+import GigCard from '@/components/GigCard.vue'
 import { useErrorToast } from '@/composables/useErrorToast'
 import { useToday } from '@/composables/useToday'
+import { stepPatch, type GigStep } from '@/services/gigSteps'
 import { formatMoney } from '@/services/money'
 import { PRODUCTS } from '@/services/products'
 import { updateGig } from '@/services/sync'
@@ -57,20 +58,10 @@ const shown = computed(() =>
     }),
 )
 
-// ---- step circles ----
+// ---- step circles (they tick and untick in order: DECISIONS 46) ----
 async function step(gig: GigRow, key: GigStep) {
-  const patch =
-    key === 'paid'
-      ? { paid_at: gig.paid_at ? null : today.value }
-      : key === 'contract'
-        ? { contract_signed: !gig.contract_signed }
-        : key === 'labor'
-          ? { labor_signed: !gig.labor_signed }
-          : key === 'delivered'
-            ? { delivered: !gig.delivered }
-            : { is_live: !gig.is_live }
   try {
-    await updateGig(gig.id, patch)
+    await updateGig(gig.id, stepPatch(gig, key, today.value))
   } catch (e) {
     console.error(e)
     showError()
@@ -81,7 +72,12 @@ async function step(gig: GigRow, key: GigStep) {
 <template>
   <main class="page">
     <div class="page-body gigs">
-      <h1 class="title">{{ t('gigs.title') }}</h1>
+      <header class="top">
+        <h1 class="title">{{ t('gigs.title') }}</h1>
+        <RouterLink to="/settings/export" class="export">
+          {{ t('gigs.export') }}
+        </RouterLink>
+      </header>
 
       <div class="stats">
         <div class="stat paid">
@@ -152,9 +148,29 @@ async function step(gig: GigRow, key: GigStep) {
   padding: 0 16px 110px;
 }
 
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px;
+}
+
+.export {
+  min-height: var(--tap);
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-pill);
+  background: var(--chip);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
 .title {
   margin: 0;
-  padding: 0 4px;
   font-family: var(--font-display);
   font-size: 26px;
   font-weight: 400;

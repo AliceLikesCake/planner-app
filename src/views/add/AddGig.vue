@@ -196,6 +196,8 @@ async function remove() {
     />
 
     <form class="page-body form" @submit.prevent="save">
+      <p v-if="failed" class="error" role="alert">{{ t('today.saveError') }}</p>
+
       <div class="card rows">
         <div class="field stacked-field">
           <label for="gig-brand" class="field-label">{{ t('addGig.brand') }}</label>
@@ -376,8 +378,6 @@ async function remove() {
           @confirm="remove"
         />
       </template>
-
-      <p v-if="failed" class="error" role="alert">{{ t('today.saveError') }}</p>
     </form>
   </main>
 </template>

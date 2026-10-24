@@ -25,6 +25,12 @@ export interface SettingsRow {
   cakes_by_weekday: string[]
   cakes_random_weekly: boolean
   max_layers: number
+  /** 目前存款 at the start of savings_date; null when not used. */
+  savings_amount: number | null
+  /** Money entries dated this day or later adjust savings_amount. */
+  savings_date: string | null
+  /** When savings_amount was last entered. */
+  savings_set_at: string | null
   updated_at: string
 }
 
