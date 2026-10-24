@@ -31,19 +31,26 @@ async function signIn() {
       <p class="tagline">{{ t('auth.tagline') }}</p>
     </div>
 
-    <p v-if="!isSupabaseConfigured" class="notice">{{ t('auth.notConfigured') }}</p>
-    <template v-else>
-      <button type="button" class="google-btn" :disabled="busy" @click="signIn">
-        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            fill="currentColor"
-            d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3zM12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22zM6.4 14a6 6 0 0 1 0-3.9V7.4H3.1a10 10 0 0 0 0 9.1L6.4 14zM12 6c1.5 0 2.8.5 3.8 1.5l2.9-2.9A10 10 0 0 0 3.1 7.5l3.3 2.6C7.2 7.8 9.4 6 12 6z"
-          />
-        </svg>
-        {{ t('auth.google') }}
+    <div class="actions">
+      <p v-if="!isSupabaseConfigured" class="notice">{{ t('auth.notConfigured') }}</p>
+      <template v-else>
+        <button type="button" class="google-btn" :disabled="busy" @click="signIn">
+          <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3zM12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22zM6.4 14a6 6 0 0 1 0-3.9V7.4H3.1a10 10 0 0 0 0 9.1L6.4 14zM12 6c1.5 0 2.8.5 3.8 1.5l2.9-2.9A10 10 0 0 0 3.1 7.5l3.3 2.6C7.2 7.8 9.4 6 12 6z"
+            />
+          </svg>
+          {{ t('auth.google') }}
+        </button>
+        <p v-if="failed" class="error" role="alert">{{ t('auth.signInError') }}</p>
+      </template>
+
+      <button type="button" class="demo-btn" @click="auth.startDemo()">
+        <span class="demo-title">{{ t('demo.try') }}</span>
+        <span class="demo-sub">{{ t('demo.trySub') }}</span>
       </button>
-      <p v-if="failed" class="error" role="alert">{{ t('auth.signInError') }}</p>
-    </template>
+    </div>
   </main>
 </template>
 
@@ -85,6 +92,35 @@ async function signIn() {
   color: var(--muted);
   font-size: 15px;
   line-height: 1.6;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.demo-btn {
+  min-height: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 16px;
+  border: 1.5px solid var(--dashed);
+  border-radius: 20px;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.demo-title {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.demo-sub {
+  font-size: 12px;
+  color: var(--muted);
 }
 
 .google-btn {

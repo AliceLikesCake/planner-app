@@ -6,6 +6,8 @@ The twist: **every to-do you finish stacks a layer onto the day's dessert** (a d
 
 Traditional Chinese and English, switchable in Settings.
 
+**Live demo:** <https://planner-app-indol-mu.vercel.app> — tap **Try the demo** (先逛逛) on the sign-in screen to explore with sample data, no account needed. Nothing is saved; reloading starts over.
+
 | Today | Calendar | Habits | Gigs | Money |
 | --- | --- | --- | --- | --- |
 | ![Today](docs/screenshots/today.png) | ![Calendar](docs/screenshots/calendar.png) | ![Habits](docs/screenshots/habits.png) | ![Gigs](docs/screenshots/gigs.png) | ![Money](docs/screenshots/money.png) |

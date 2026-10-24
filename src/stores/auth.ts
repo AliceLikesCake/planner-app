@@ -1,8 +1,16 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { User } from '@supabase/supabase-js'
-import { isSupabaseConfigured, supabase } from '@/services/supabase'
+import {
+  DEMO_USER_ID,
+  enterDemo,
+  exitDemo,
+  isSupabaseConfigured,
+  supabase,
+} from '@/services/supabase'
 import { clearUserData, loadUserData } from '@/services/session'
+import { seedDemo } from '@/services/demo'
+import { todayKey } from '@/services/dates'
 
 export type AuthStatus = 'loading' | 'signedOut' | 'ready' | 'error'
 
@@ -11,9 +19,13 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
   /** When everything was last read from Supabase. */
   const lastSyncedAt = ref<Date | null>(null)
+  /** Exploring sample data without signing in (DECISIONS 57). */
+  const demo = ref(false)
   let started = false
 
   async function enter(next: User | null) {
+    // Supabase's own sign-in events don't end the demo.
+    if (demo.value) return
     if (next?.id === user.value?.id && status.value === 'ready') {
       user.value = next
       return
@@ -57,7 +69,37 @@ export const useAuthStore = defineStore('auth', () => {
     if (error) throw error
   }
 
+  /** 先逛逛: an in-memory copy of the app filled with sample data. Nothing is saved. */
+  async function startDemo() {
+    clearUserData()
+    enterDemo()
+    demo.value = true
+    user.value = { id: DEMO_USER_ID, email: undefined } as unknown as User
+    status.value = 'loading'
+    try {
+      await loadUserData(DEMO_USER_ID)
+      await seedDemo(todayKey())
+      status.value = 'ready'
+      lastSyncedAt.value = new Date()
+    } catch (error) {
+      console.error(error)
+      leaveDemo()
+    }
+  }
+
+  function leaveDemo() {
+    clearUserData()
+    exitDemo()
+    demo.value = false
+    user.value = null
+    status.value = 'signedOut'
+  }
+
   async function signOut() {
+    if (demo.value) {
+      leaveDemo()
+      return
+    }
     const { error } = await supabase.auth.signOut()
     if (error) throw error
     await enter(null)
@@ -69,10 +111,22 @@ export const useAuthStore = defineStore('auth', () => {
 
   /** 立即同步: reads everything again, picking up changes made on another device. */
   async function syncNow() {
-    if (!user.value) return
+    if (!user.value || demo.value) return
     await loadUserData(user.value.id)
     lastSyncedAt.value = new Date()
   }
 
-  return { status, user, lastSyncedAt, init, signInWithGoogle, signOut, retry, syncNow }
+  return {
+    status,
+    user,
+    lastSyncedAt,
+    demo,
+    init,
+    signInWithGoogle,
+    signOut,
+    retry,
+    syncNow,
+    startDemo,
+    leaveDemo,
+  }
 })

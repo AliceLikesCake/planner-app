@@ -590,5 +590,11 @@
     "sub": "Subscriptions, rent, salary — anything monthly or yearly",
     "upcoming": "Upcoming",
     "upcomingSub": "Not yet due; not in the totals"
+  },
+  "demo": {
+    "try": "Try the demo",
+    "trySub": "No sign-in. Play with sample data; nothing is saved.",
+    "banner": "Demo · nothing is saved; reloading starts over",
+    "leave": "Leave"
   }
 }

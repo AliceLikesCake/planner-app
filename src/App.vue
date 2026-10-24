@@ -15,7 +15,14 @@ auth.init()
 </script>
 
 <template>
-  <LoginView v-if="!isSupabaseConfigured || auth.status === 'signedOut'" />
+  <div v-if="auth.demo" class="demo-bar" role="status">
+    <span>{{ t('demo.banner') }}</span>
+    <button type="button" class="demo-leave" @click="auth.leaveDemo()">
+      {{ t('demo.leave') }}
+    </button>
+  </div>
+
+  <LoginView v-if="auth.status === 'signedOut' || (!isSupabaseConfigured && !auth.demo)" />
 
   <div v-else-if="auth.status === 'loading'" class="status">
     <p>{{ t('auth.loading') }}</p>
@@ -41,6 +48,43 @@ auth.init()
 </template>
 
 <style scoped>
+/* Demo mode notice, above every page (DECISIONS 57). */
+.demo-bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: calc(env(safe-area-inset-top) + 4px) 12px 4px 16px;
+  background: var(--butter-fill);
+  color: var(--butter-text);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.demo-leave {
+  min-height: 32px;
+  padding: 0 12px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+  position: relative;
+}
+
+.demo-leave::after {
+  content: '';
+  position: absolute;
+  inset: -6px 0;
+}
+
+/* The bar already clears the status bar. */
+.demo-bar ~ :deep(.page) {
+  padding-top: 12px;
+}
+
 .dock {
   position: relative;
   flex-shrink: 0;
