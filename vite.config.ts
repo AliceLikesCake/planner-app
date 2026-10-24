@@ -34,6 +34,8 @@ export default defineConfig({
       workbox: {
         // The app shell, icons and sounds; data always comes live from Supabase.
         globPatterns: ['**/*.{js,css,html,svg,png,wav}'],
+        // Screenshots are only for the About page; no need to download them up front.
+        globIgnores: ['screenshots/**'],
         navigateFallback: '/index.html',
         runtimeCaching: [
           {

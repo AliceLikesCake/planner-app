@@ -8,6 +8,8 @@ declare module 'vue-router' {
     fab?: string
     /** i18n key for the ＋ button's label. */
     fabLabel?: string
+    /** Open without signing in (the About page). */
+    public?: boolean
   }
 }
 
@@ -45,6 +47,12 @@ const router = createRouter({
       meta: { tab: true, fab: '/add/money', fabLabel: 'money.addEntry' },
     },
     { path: '/settings', name: 'settings', component: () => import('@/views/SettingsView.vue') },
+    {
+      path: '/about',
+      name: 'about',
+      component: () => import('@/views/AboutView.vue'),
+      meta: { public: true },
+    },
 
     { path: '/add/task', name: 'add-task', component: () => import('@/views/add/AddTask.vue') },
     { path: '/add/event', name: 'add-event', component: () => import('@/views/add/AddEvent.vue') },

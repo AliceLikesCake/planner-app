@@ -10,7 +10,7 @@ Traditional Chinese and English, switchable in Settings.
 
 | Today | Calendar | Habits | Gigs | Money |
 | --- | --- | --- | --- | --- |
-| ![Today](docs/screenshots/today.png) | ![Calendar](docs/screenshots/calendar.png) | ![Habits](docs/screenshots/habits.png) | ![Gigs](docs/screenshots/gigs.png) | ![Money](docs/screenshots/money.png) |
+| ![Today](public/screenshots/today.png) | ![Calendar](public/screenshots/calendar.png) | ![Habits](public/screenshots/habits.png) | ![Gigs](public/screenshots/gigs.png) | ![Money](public/screenshots/money.png) |
 
 ## Features
 
@@ -112,7 +112,8 @@ src/
   services/         supabase, session, sync, dates, repeat, habits, money, export, sound, backup
   locales/          zh-TW.json, en.json
 supabase/schema.sql database, indexes and RLS policies
-docs/               SPEC.md (spec), DECISIONS.md (decisions that override it), screenshots
+docs/               SPEC.md (spec), DECISIONS.md (decisions that override it)
+public/screenshots/ screenshots used here and on the in-app About page
 ```
 
 ## Running it locally

@@ -22,7 +22,9 @@ auth.init()
     </button>
   </div>
 
-  <LoginView v-if="auth.status === 'signedOut' || (!isSupabaseConfigured && !auth.demo)" />
+  <RouterView v-if="route.meta.public" />
+
+  <LoginView v-else-if="auth.status === 'signedOut' || (!isSupabaseConfigured && !auth.demo)" />
 
   <div v-else-if="auth.status === 'loading'" class="status">
     <p>{{ t('auth.loading') }}</p>

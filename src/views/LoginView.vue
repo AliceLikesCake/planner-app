@@ -50,6 +50,7 @@ async function signIn() {
         <span class="demo-title">{{ t('demo.try') }}</span>
         <span class="demo-sub">{{ t('demo.trySub') }}</span>
       </button>
+      <RouterLink to="/about" class="about-link">{{ t('about.link') }} →</RouterLink>
     </div>
   </main>
 </template>
@@ -98,6 +99,16 @@ async function signIn() {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.about-link {
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .demo-btn {
