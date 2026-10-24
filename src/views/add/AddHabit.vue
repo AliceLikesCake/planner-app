@@ -256,7 +256,7 @@ async function remove() {
   outline: none;
   background: transparent;
   color: var(--ink);
-  font-size: 15px;
+  font-size: 16px;
 }
 
 .swatches {

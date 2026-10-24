@@ -147,6 +147,13 @@
   font-size: 15px;
 }
 
+/* A short label keeps its width; the input next to it takes what is left. Two-line labels
+   (.row-text) still wrap. */
+.form .row > label:not(.row-text),
+.form .row > span:first-child:not(.row-text) {
+  flex-shrink: 0;
+}
+
 .form .row + .row {
   border-top: 1px solid var(--divider);
 }
@@ -206,10 +213,13 @@
   outline: none;
   background: transparent;
   color: var(--ink);
-  font-size: 15px;
+  /* 16px: iPhone Safari zooms into any input with smaller text when it is tapped. */
+  font-size: 16px;
   font-weight: 700;
   text-align: right;
   font-variant-numeric: tabular-nums;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .form .time-wrap {
@@ -233,7 +243,7 @@
   resize: none;
   background: transparent;
   color: var(--ink);
-  font-size: 15px;
+  font-size: 16px;
 }
 
 /* Sits at the top of the form and stays in view while scrolling, so a failed save is never

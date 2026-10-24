@@ -442,7 +442,7 @@ const sections = computed<{ title: string; rows: Row[] }[]>(() => [
   outline: none;
   background: transparent;
   color: var(--muted);
-  font-size: 14px;
+  font-size: 16px;
   text-align: right;
 }
 

@@ -359,7 +359,7 @@ function add(type: CategoryType) {
   outline: none;
   background: var(--surface-muted);
   color: var(--ink);
-  font-size: 15px;
+  font-size: 16px;
 }
 
 .palette {

@@ -358,7 +358,7 @@ const start = computed<'1' | '5'>({
   outline: none;
   background: transparent;
   color: var(--ink);
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   text-align: center;
 }
