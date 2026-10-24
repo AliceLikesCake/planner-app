@@ -70,7 +70,14 @@
     "doneCount": "完成 {done} / {total}",
     "left": "再完成 {n} 件，蛋糕就疊好了",
     "allDone": "完成了！好好犒賞自己",
-    "addTask": "新增待辦"
+    "addTask": "新增待辦",
+    "markDone": "完成：{title}",
+    "markUndo": "取消完成：{title}",
+    "empty": "今天還沒有待辦，按右下角的 ＋ 新增一件吧",
+    "emptyCake": "新增待辦，開始疊蛋糕",
+    "cakeAria": "{dessert}，已疊上 {done} / {total} 層",
+    "previewDessert": "看{dessert}",
+    "saveError": "沒有存到，請檢查網路後再試一次"
   },
   "calendar": {
     "title": "{year}年{month}月",
@@ -180,5 +187,35 @@
     "notConfigured": "還沒連上 Supabase。請在專案根目錄的 .env.local 填入 VITE_SUPABASE_URL 和 VITE_SUPABASE_ANON_KEY，然後重新啟動。",
     "signOut": "登出",
     "signedInWithGoogle": "用 Google 帳號登入"
+  },
+  "addTask": {
+    "what": "要做什麼？",
+    "placeholder": "例如：回覆品牌 A 修改意見",
+    "category": "類別",
+    "gig": "關聯的接案（選填）",
+    "noGig": "不關聯",
+    "date": "日期",
+    "time": "時間（選填）",
+    "clearTime": "清除時間",
+    "repeat": "重複",
+    "repeatNone": "不重複",
+    "repeatDay": "每天",
+    "repeatWeek": "每週",
+    "repeatMonth": "每月",
+    "every": {
+      "day": "每天",
+      "week": "每週",
+      "month": "每月"
+    },
+    "remind": "提醒我",
+    "remindSub": "開始前 30 分鐘通知",
+    "calendar": "顯示在月曆",
+    "calendarSub": "在月曆的那天也看得到",
+    "note": "備註",
+    "syncToday": "{date} 的今日待辦，完成時疊上一層{category}蛋糕",
+    "syncTodayRepeat": "從 {date} 起{repeat}出現在今日待辦，完成時疊上一層{category}蛋糕",
+    "syncCalendar": "月曆 {date} 的待辦事項清單",
+    "syncGig": "接案頁「{brand}」的相關待辦",
+    "syncRemind": "{time} 推播提醒"
   }
 }

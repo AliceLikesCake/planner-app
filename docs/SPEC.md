@@ -194,6 +194,7 @@ SQL 在 `supabase/schema.sql`（含 Row Level Security，每張表只能讀寫�
 | profiles / settings | 使用者設定（語言、音效、預算、甜點、同步開關…） |
 | categories | 待辦、行程、記帳的類別，`name_zh` + `name_en`，顏色 key |
 | tasks | 待辦，可帶 `gig_id`、`event_id`、`source` |
+| task_completions | 重複待辦每一天的完成紀錄（見 DECISIONS 8） |
 | events | 行程（可跨天），可帶 `gig_id`、`source` |
 | habits / habit_logs | 習慣與每日紀錄 |
 | gigs | 接案（品牌、金額、日期、合約、勞報單、交稿、上線、入帳） |

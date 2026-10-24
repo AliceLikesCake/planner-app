@@ -16,7 +16,15 @@ export const supabase = createClient(
 )
 
 export type TableName =
-  'settings' | 'categories' | 'gigs' | 'events' | 'tasks' | 'habits' | 'habit_logs' | 'transactions'
+  | 'settings'
+  | 'categories'
+  | 'gigs'
+  | 'events'
+  | 'tasks'
+  | 'task_completions'
+  | 'habits'
+  | 'habit_logs'
+  | 'transactions'
 
 /** The signed-in user's id, read from the locally stored session (no network call). */
 export async function requireUserId(): Promise<string> {

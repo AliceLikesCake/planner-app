@@ -70,7 +70,14 @@
     "doneCount": "Done {done} / {total}",
     "left": "{n} more to finish the cake",
     "allDone": "All done! Treat yourself",
-    "addTask": "Add task"
+    "addTask": "Add task",
+    "markDone": "Done: {title}",
+    "markUndo": "Undo: {title}",
+    "empty": "Nothing for today yet. Tap ＋ to add a to-do.",
+    "emptyCake": "Add a to-do to start your cake",
+    "cakeAria": "{dessert}, {done} of {total} layers stacked",
+    "previewDessert": "Show {dessert}",
+    "saveError": "Couldn’t save. Check your connection and try again."
   },
   "calendar": {
     "title": "{month} {year}",
@@ -180,5 +187,35 @@
     "notConfigured": "Supabase isn’t connected yet. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to .env.local in the project root, then restart.",
     "signOut": "Sign out",
     "signedInWithGoogle": "Signed in with Google"
+  },
+  "addTask": {
+    "what": "What needs doing?",
+    "placeholder": "e.g. Reply to Brand A’s edits",
+    "category": "Category",
+    "gig": "Linked gig (optional)",
+    "noGig": "None",
+    "date": "Date",
+    "time": "Time (optional)",
+    "clearTime": "Clear time",
+    "repeat": "Repeat",
+    "repeatNone": "Never",
+    "repeatDay": "Daily",
+    "repeatWeek": "Weekly",
+    "repeatMonth": "Monthly",
+    "every": {
+      "day": "every day",
+      "week": "every week",
+      "month": "every month"
+    },
+    "remind": "Remind me",
+    "remindSub": "30 minutes before it starts",
+    "calendar": "Show in calendar",
+    "calendarSub": "Also listed on that day in the calendar",
+    "note": "Note",
+    "syncToday": "To-dos on {date}; finishing it stacks a {category} layer",
+    "syncTodayRepeat": "To-dos {repeat} from {date}; finishing it stacks a {category} layer",
+    "syncCalendar": "The calendar’s to-do list on {date}",
+    "syncGig": "Related to-dos for “{brand}” on the Gigs page",
+    "syncRemind": "Push reminder at {time}"
   }
 }

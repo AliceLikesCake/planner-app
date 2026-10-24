@@ -79,6 +79,11 @@
   --cake-study: #c6dbb6;
   --cake-life: #f0de9f;
   --cake-health: #efc1c1;
+  /* tones for the remaining palette colors, used when a category is recolored */
+  --cake-peach: #f3cdb8;
+  --cake-mint: #bce0d6;
+  --cake-pink: #efc6d9;
+  --cake-sand: #d9d2c7;
 
   /* shape */
   --radius-card: 22px;

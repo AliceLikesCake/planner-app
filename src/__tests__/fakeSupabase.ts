@@ -7,6 +7,25 @@ type Result = { data: unknown; error: { message: string } | null; count?: number
 const PRIMARY_KEYS: Record<string, string[]> = {
   settings: ['user_id'],
   habit_logs: ['habit_id', 'date'],
+  task_completions: ['task_id', 'date'],
+}
+
+// Column defaults from supabase/schema.sql that the app relies on.
+const DEFAULTS: Record<string, Row> = {
+  tasks: {
+    category_id: null,
+    time: null,
+    repeat: 'none',
+    remind: false,
+    show_in_calendar: true,
+    note: null,
+    done: false,
+    done_at: null,
+    source: 'manual',
+    gig_id: null,
+    gig_kind: null,
+    event_id: null,
+  },
 }
 
 let nextId = 1
@@ -111,7 +130,7 @@ class Query implements PromiseLike<Result> {
       for (const input of this.payload) {
         if (input.user_id !== fakeDb.userId)
           return { data: null, error: { message: 'RLS violation' } }
-        const row: Row = { created_at: new Date().toISOString(), ...input }
+        const row: Row = { ...DEFAULTS[this.table], created_at: new Date().toISOString(), ...input }
         if (!PRIMARY_KEYS[this.table] && row.id === undefined) row.id = `id-${nextId++}`
         const existing = rows.findIndex((r) => keyOf(this.table, r) === keyOf(this.table, row))
         if (existing >= 0) {

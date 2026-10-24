@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { useTable } from './table'
+import { i18n } from '@/i18n'
 import type { CategoryRow, CategoryType, NewRow } from '@/types/db'
 
 export type NewCategory = NewRow<CategoryRow, 'type' | 'name_zh' | 'name_en' | 'color'>
@@ -19,5 +20,11 @@ export const useCategoriesStore = defineStore('categories', () => {
     return id ? table.items.value.find((c) => c.id === id) : undefined
   }
 
-  return { ...table, ofType, byId }
+  /** Name in the current language (SPEC 7: name_zh / name_en). */
+  function name(category: CategoryRow | undefined) {
+    if (!category) return ''
+    return i18n.global.locale.value === 'en' ? category.name_en : category.name_zh
+  }
+
+  return { ...table, ofType, byId, name }
 })

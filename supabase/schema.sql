@@ -113,6 +113,16 @@ create index if not exists tasks_user_date on public.tasks (user_id, date);
 create unique index if not exists tasks_gig_kind_uniq on public.tasks (gig_id, gig_kind) where gig_id is not null;
 create unique index if not exists tasks_event_date_uniq on public.tasks (event_id, date) where event_id is not null;
 
+-- Completions of repeating tasks, one row per day ticked (DECISIONS 4).
+-- A non-repeating task keeps using tasks.done / tasks.done_at.
+create table if not exists public.task_completions (
+  task_id uuid not null references public.tasks(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  date date not null,
+  done_at timestamptz not null default now(),
+  primary key (task_id, date)
+);
+
 -- ---------- habits ----------
 create table if not exists public.habits (
   id uuid primary key default gen_random_uuid(),
@@ -154,7 +164,7 @@ create unique index if not exists transactions_gig_uniq on public.transactions (
 do $$
 declare t text;
 begin
-  foreach t in array array['settings','categories','gigs','events','tasks','habits','habit_logs','transactions'] loop
+  foreach t in array array['settings','categories','gigs','events','tasks','task_completions','habits','habit_logs','transactions'] loop
     execute format('alter table public.%I enable row level security', t);
     execute format('drop policy if exists "own rows" on public.%I', t);
     execute format('create policy "own rows" on public.%I for all using (auth.uid() = user_id) with check (auth.uid() = user_id)', t);

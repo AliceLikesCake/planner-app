@@ -106,6 +106,13 @@ export interface TaskRow {
   created_at: string
 }
 
+export interface TaskCompletionRow {
+  task_id: string
+  user_id: string
+  date: string
+  done_at: string
+}
+
 export interface HabitRow {
   id: string
   user_id: string
