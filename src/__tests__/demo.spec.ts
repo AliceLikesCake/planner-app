@@ -11,6 +11,8 @@ import { useMoneyStore } from '../stores/money'
 import { useRecurringStore } from '../stores/recurring'
 import { useSettingsStore } from '../stores/settings'
 import { useTasksStore } from '../stores/tasks'
+import { useAuthStore } from '../stores/auth'
+import { i18n } from '../i18n'
 
 vi.mock('@/services/supabase', () => import('./fakeSupabase'))
 
@@ -36,5 +38,19 @@ describe('demo data', () => {
     expect(useMoneyStore().items.some((t) => t.gig_id)).toBe(true)
     expect(useRecurringStore().items).toHaveLength(3)
     expect(currentSavings(useSettingsStore().row, useMoneyStore().items)).toBeGreaterThan(120000)
+  })
+
+  it('runs in English and puts the language back on leaving', async () => {
+    const settings = useSettingsStore()
+    await settings.setLang('zh-TW')
+    const auth = useAuthStore()
+
+    await auth.startDemo()
+    expect(auth.status).toBe('ready')
+    expect(i18n.global.locale.value).toBe('en')
+    expect(useHabitsStore().items[0]?.name).toBe('Water')
+
+    auth.leaveDemo()
+    expect(i18n.global.locale.value).toBe('zh-TW')
   })
 })

@@ -4,7 +4,9 @@ import { useRouter } from 'vue-router'
 import BackHeader from '@/components/BackHeader.vue'
 import { useAuthStore } from '@/stores/auth'
 
-const { t } = useI18n()
+const i18n = useI18n()
+// The About page is for CV readers, so it is always in English (DECISIONS 59).
+const t = (key: string) => i18n.t(key, {}, { locale: 'en' })
 const router = useRouter()
 const auth = useAuthStore()
 
@@ -47,7 +49,7 @@ async function tryDemo() {
 </script>
 
 <template>
-  <main class="page">
+  <main class="page" lang="en">
     <BackHeader :title="t('about.title')" fallback="/" />
     <div class="page-body about">
       <section class="hero">

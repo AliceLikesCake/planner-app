@@ -19,3 +19,13 @@ export async function requireUserId(): Promise<string> {
   if (!memoryDb.userId) throw new Error('Not signed in')
   return memoryDb.userId
 }
+
+export const DEMO_USER_ID = 'demo-user'
+
+export function enterDemo() {
+  memoryDb.reset(DEMO_USER_ID)
+}
+
+export function exitDemo() {
+  memoryDb.reset(null)
+}

@@ -11,6 +11,8 @@ import {
 import { clearUserData, loadUserData } from '@/services/session'
 import { seedDemo } from '@/services/demo'
 import { todayKey } from '@/services/dates'
+import { useSettingsStore } from '@/stores/settings'
+import type { Locale } from '@/i18n'
 
 export type AuthStatus = 'loading' | 'signedOut' | 'ready' | 'error'
 
@@ -21,6 +23,8 @@ export const useAuthStore = defineStore('auth', () => {
   const lastSyncedAt = ref<Date | null>(null)
   /** Exploring sample data without signing in (DECISIONS 57). */
   const demo = ref(false)
+  /** The language before the demo, put back when it ends. */
+  let langBeforeDemo: Locale | null = null
   let started = false
 
   async function enter(next: User | null) {
@@ -72,6 +76,10 @@ export const useAuthStore = defineStore('auth', () => {
   /** 先逛逛: an in-memory copy of the app filled with sample data. Nothing is saved. */
   async function startDemo() {
     clearUserData()
+    // The demo is for CV readers, so it is always in English (DECISIONS 59).
+    const settings = useSettingsStore()
+    langBeforeDemo ??= settings.lang
+    await settings.setLang('en')
     enterDemo()
     demo.value = true
     user.value = { id: DEMO_USER_ID, email: undefined } as unknown as User
@@ -93,6 +101,10 @@ export const useAuthStore = defineStore('auth', () => {
     demo.value = false
     user.value = null
     status.value = 'signedOut'
+    if (langBeforeDemo) {
+      void useSettingsStore().setLang(langBeforeDemo)
+      langBeforeDemo = null
+    }
   }
 
   async function signOut() {
