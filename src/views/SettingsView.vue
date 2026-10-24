@@ -187,6 +187,7 @@ const sections = computed<{ title: string; rows: Row[] }[]>(() => [
         value: t('settings.backupValue'),
         to: '/settings/backup',
       },
+      { kind: 'link', label: t('about.title'), to: '/about' },
       { kind: 'disabled', label: t('settings.feedback'), sub: t('settings.feedbackSoon') },
     ],
   },
