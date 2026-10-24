@@ -15,6 +15,8 @@ import {
 } from '@/services/money'
 import { useCategoriesStore } from '@/stores/categories'
 import { useMoneyStore } from '@/stores/money'
+import { useRecurringStore } from '@/stores/recurring'
+import { upcomingDates } from '@/services/recurring'
 import { useSettingsStore } from '@/stores/settings'
 import { paletteVars } from '@/styles/palette'
 import type { TransactionRow } from '@/types/db'
@@ -94,6 +96,32 @@ const detailCategories = computed(() =>
 watch(detailFilter, () => {
   if (!detailCategories.value.some((c) => c.id === detailCategory.value))
     detailCategory.value = null
+})
+
+// 預計: recurring entries still to come in this period (DECISIONS 55). Not in any total.
+const recurring = useRecurringStore()
+const upcoming = computed(() => {
+  const fmt = new Intl.DateTimeFormat(locale.value, { month: 'numeric', day: 'numeric' })
+  return recurring.items
+    .filter(
+      (r) =>
+        (detailFilter.value === 'all' || r.type === detailFilter.value) &&
+        (detailCategory.value === null || r.category_id === detailCategory.value),
+    )
+    .flatMap((rule) =>
+      upcomingDates(rule, period.value.start, period.value.end, today.value).map((date) => {
+        const category = categories.byId(rule.category_id)
+        return {
+          key: `${rule.id}-${date}`,
+          rule,
+          date,
+          label: fmt.format(fromKey(date)),
+          category,
+          name: rule.note || categories.name(category),
+        }
+      }),
+    )
+    .sort((a, b) => a.date.localeCompare(b.date))
 })
 
 const days = computed(() => {
@@ -303,6 +331,30 @@ const days = computed(() => {
             <span class="chip-dot" />{{ categories.name(c) }}
           </button>
         </div>
+        <div v-if="upcoming.length" class="card day upcoming">
+          <div class="day-head">
+            <span class="day-label">{{ t('recurring.upcoming') }}</span>
+            <span>{{ t('recurring.upcomingSub') }}</span>
+          </div>
+          <RouterLink
+            v-for="item in upcoming"
+            :key="item.key"
+            :to="`/edit/recurring/${item.rule.id}`"
+            class="entry"
+            :style="paletteVars(item.category?.color)"
+          >
+            <span class="entry-dot" />
+            <span class="entry-text">
+              <span class="entry-name">{{ item.name }}</span>
+              <span class="entry-meta num"
+                >{{ item.label }} · {{ categories.name(item.category) }}</span
+              >
+            </span>
+            <span class="entry-amount num">
+              {{ formatSigned(item.rule.type === 'income' ? item.rule.amount : -item.rule.amount) }}
+            </span>
+          </RouterLink>
+        </div>
         <div v-for="day in days" :key="day.date" class="card day">
           <div class="day-head num">
             <span class="day-label">{{ day.label }}</span>
@@ -319,14 +371,18 @@ const days = computed(() => {
             <span class="entry-dot" />
             <span class="entry-text">
               <span class="entry-name">{{ item.name }}</span>
-              <span class="entry-meta">{{ item.categoryName }}</span>
+              <span class="entry-meta">{{
+                item.tx.recurring_id
+                  ? `${item.categoryName} · ${t('recurring.tag')}`
+                  : item.categoryName
+              }}</span>
             </span>
             <span class="entry-amount num" :class="{ income: item.tx.type === 'income' }">
               {{ formatSigned(item.tx.type === 'income' ? item.tx.amount : -item.tx.amount) }}
             </span>
           </RouterLink>
         </div>
-        <p v-if="!days.length" class="card empty-card">
+        <p v-if="!days.length && !upcoming.length" class="card empty-card">
           {{
             detailCategory !== null
               ? t('money.emptyType', { type: categories.name(categories.byId(detailCategory)) })
@@ -759,6 +815,16 @@ const days = computed(() => {
 
 .entry-amount.income {
   color: var(--paid-fg);
+}
+
+.upcoming .entry-name,
+.upcoming .entry-amount {
+  color: var(--faint);
+}
+
+.upcoming .entry-dot {
+  background: transparent;
+  border: 2px dashed var(--c-deep);
 }
 
 .empty-card {

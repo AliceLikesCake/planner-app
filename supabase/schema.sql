@@ -154,6 +154,21 @@ create table if not exists public.habit_logs (
   primary key (habit_id, date)
 );
 
+-- ---------- recurring transactions (固定收支, DECISIONS 53) ----------
+-- A rule that records a money entry every month or year on the start date's day.
+create table if not exists public.recurring_transactions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  type text not null check (type in ('expense', 'income')),
+  amount integer not null check (amount >= 0),
+  category_id uuid references public.categories(id) on delete set null,
+  note text,
+  frequency text not null check (frequency in ('month', 'year')),
+  start_date date not null,       -- first occurrence; its day (and month, yearly) set the schedule
+  last_date date,                 -- latest occurrence already recorded
+  created_at timestamptz not null default now()
+);
+
 -- ---------- transactions ----------
 create table if not exists public.transactions (
   id uuid primary key default gen_random_uuid(),
@@ -167,13 +182,15 @@ create table if not exists public.transactions (
   created_at timestamptz not null default now()
 );
 create index if not exists transactions_user_date on public.transactions (user_id, date);
+alter table public.transactions add column if not exists recurring_id uuid references public.recurring_transactions(id) on delete set null;
+create unique index if not exists transactions_recurring_date_uniq on public.transactions (recurring_id, date) where recurring_id is not null;
 create unique index if not exists transactions_gig_uniq on public.transactions (gig_id) where gig_id is not null;
 
 -- ---------- Row Level Security ----------
 do $$
 declare t text;
 begin
-  foreach t in array array['settings','categories','gigs','events','tasks','task_completions','habits','habit_logs','transactions'] loop
+  foreach t in array array['settings','categories','gigs','events','tasks','task_completions','habits','habit_logs','recurring_transactions','transactions'] loop
     execute format('alter table public.%I enable row level security', t);
     execute format('drop policy if exists "own rows" on public.%I', t);
     execute format('create policy "own rows" on public.%I for all using (auth.uid() = user_id) with check (auth.uid() = user_id)', t);

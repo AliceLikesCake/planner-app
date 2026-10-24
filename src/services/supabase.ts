@@ -24,6 +24,7 @@ export type TableName =
   | 'task_completions'
   | 'habits'
   | 'habit_logs'
+  | 'recurring_transactions'
   | 'transactions'
 
 /** The signed-in user's id, read from the locally stored session (no network call). */

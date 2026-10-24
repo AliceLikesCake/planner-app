@@ -151,6 +151,23 @@ export interface TransactionRow {
   date: string
   note: string | null
   gig_id: string | null
+  /** Set on entries recorded by a recurring rule (固定收支). */
+  recurring_id: string | null
+  created_at: string
+}
+
+export interface RecurringRow {
+  id: string
+  user_id: string
+  type: 'expense' | 'income'
+  amount: number
+  category_id: string | null
+  note: string | null
+  frequency: 'month' | 'year'
+  /** First occurrence; its day (and month, for yearly) set the schedule. */
+  start_date: string
+  /** Latest occurrence already recorded. */
+  last_date: string | null
   created_at: string
 }
 

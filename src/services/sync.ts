@@ -6,9 +6,18 @@ import { useCategoriesStore } from '@/stores/categories'
 import { useEventsStore, type NewEvent } from '@/stores/events'
 import { useGigsStore, type NewGig } from '@/stores/gigs'
 import { useMoneyStore, type NewTransaction } from '@/stores/money'
+import { useRecurringStore, type NewRecurring } from '@/stores/recurring'
+import { dueDates } from './recurring'
 import { useSettingsStore } from '@/stores/settings'
 import { useTasksStore, type TaskOccurrence } from '@/stores/tasks'
-import type { CategoryRow, EventRow, GigRow, TaskRow, TransactionRow } from '@/types/db'
+import type {
+  CategoryRow,
+  EventRow,
+  GigRow,
+  RecurringRow,
+  TaskRow,
+  TransactionRow,
+} from '@/types/db'
 
 // ---- Rule 6: to-dos with a date show on that day in the calendar (read directly, no copies) ----
 
@@ -402,4 +411,77 @@ export async function updateTransaction(
   const tx = await useMoneyStore().update(id, patch)
   await markLinkedGigPaid(tx)
   return tx
+}
+
+// ---- 固定收支: recurring money entries (DECISIONS 53) ----
+
+const isDuplicate = (error: unknown) => (error as { code?: string } | null)?.code === '23505'
+
+/**
+ * Records every occurrence of `rule` that is due by `today` and not recorded yet. A date
+ * recorded on another device in the meantime is skipped (unique recurring_id + date).
+ */
+async function recordDue(rule: RecurringRow, today: DateKey) {
+  const dates = dueDates(rule, today)
+  if (!dates.length) return
+  const money = useMoneyStore()
+  for (const date of dates) {
+    if (money.items.some((tx) => tx.recurring_id === rule.id && tx.date === date)) continue
+    try {
+      await money.add({
+        type: rule.type,
+        amount: rule.amount,
+        category_id: rule.category_id,
+        note: rule.note,
+        date,
+        recurring_id: rule.id,
+      })
+    } catch (error) {
+      if (!isDuplicate(error)) throw error
+    }
+  }
+  await useRecurringStore().update(rule.id, { last_date: dates[dates.length - 1]! })
+}
+
+/** Runs on every app open: records what came due since last time. */
+export async function generateRecurring(today: DateKey) {
+  for (const rule of useRecurringStore().items) await recordDue(rule, today)
+}
+
+/** A new entry set to repeat: the rule, plus every occurrence already due (the first one, if today or earlier). */
+export async function createRecurring(row: NewRecurring, today: DateKey): Promise<RecurringRow> {
+  const rule = await useRecurringStore().add({ ...row, last_date: null })
+  await recordDue(rule, today)
+  return rule
+}
+
+/** Turns an existing entry into the first occurrence of a new rule. */
+export async function makeEntryRecurring(tx: TransactionRow, frequency: RecurringRow['frequency']) {
+  const rule = await useRecurringStore().add({
+    type: tx.type,
+    amount: tx.amount,
+    category_id: tx.category_id,
+    note: tx.note,
+    frequency,
+    start_date: tx.date,
+    last_date: tx.date,
+  })
+  await useMoneyStore().update(tx.id, { recurring_id: rule.id })
+  return rule
+}
+
+/** Changes a rule; occurrences already recorded stay as they are. */
+export async function updateRecurring(id: string, patch: Partial<NewRecurring>, today: DateKey) {
+  const rule = await useRecurringStore().update(id, patch)
+  await recordDue(rule, today)
+  return rule
+}
+
+/** Stops a rule. Its recorded entries stay as plain entries. */
+export async function deleteRecurring(id: string) {
+  await useRecurringStore().remove(id)
+  const money = useMoneyStore()
+  money.items = money.items.map((tx) =>
+    tx.recurring_id === id ? { ...tx, recurring_id: null } : tx,
+  )
 }

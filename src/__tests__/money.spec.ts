@@ -22,6 +22,7 @@ const tx = (
   category_id,
   note: null,
   gig_id: null,
+  recurring_id: null,
   created_at: '',
 })
 

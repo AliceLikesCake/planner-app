@@ -167,6 +167,17 @@
   padding: 0;
 }
 
+.form .grid-3 {
+  clear: both;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.form .grid-3 .chip {
+  padding: 0;
+}
+
 .form .grid-4 {
   clear: both;
   display: grid;

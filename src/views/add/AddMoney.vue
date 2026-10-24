@@ -10,15 +10,29 @@ import SegmentedControl from '@/components/SegmentedControl.vue'
 import SyncSummary from '@/components/SyncSummary.vue'
 import { fromKey, todayKey } from '@/services/dates'
 import { formatMoney } from '@/services/money'
-import { gigIncome, recordTransaction, updateTransaction } from '@/services/sync'
+import { parseQuickAdd, type QuickAdd } from '@/services/quickAdd'
+import {
+  createRecurring,
+  deleteRecurring,
+  gigIncome,
+  makeEntryRecurring,
+  recordTransaction,
+  updateRecurring,
+  updateTransaction,
+} from '@/services/sync'
+import { useScheduleLabel } from '@/composables/useSchedule'
+import { useRecurringStore } from '@/stores/recurring'
 import { useCategoriesStore } from '@/stores/categories'
 import { useGigsStore } from '@/stores/gigs'
 import { useMoneyStore } from '@/stores/money'
 import { paletteVars } from '@/styles/palette'
-import type { TransactionRow } from '@/types/db'
+import type { RecurringRow, TransactionRow } from '@/types/db'
 
-/** Set on /edit/money/:id; the form then edits that entry instead of adding one. */
-const props = defineProps<{ id?: string }>()
+/**
+ * /edit/money/:id edits an entry; /edit/recurring/:recurringId edits a 固定收支 rule
+ * (DECISIONS 53). Without either, the form adds an entry.
+ */
+const props = defineProps<{ id?: string; recurringId?: string }>()
 
 const { t, locale } = useI18n()
 const route = useRoute()
@@ -26,24 +40,37 @@ const router = useRouter()
 const categories = useCategoriesStore()
 const gigs = useGigsStore()
 const money = useMoneyStore()
+const recurring = useRecurringStore()
+const scheduleLabel = useScheduleLabel()
 
 const existing = props.id ? money.items.find((tx) => tx.id === props.id) : undefined
+// The rule being edited, or the rule that recorded the entry being edited.
+const rule = props.recurringId ? recurring.items.find((r) => r.id === props.recurringId) : undefined
+const ruleOfEntry = existing?.recurring_id
+  ? recurring.items.find((r) => r.id === existing.recurring_id)
+  : undefined
 
 function leave() {
   if (window.history.state?.back) router.back()
-  else router.replace('/money')
+  else router.replace(rule ? '/settings/recurring' : '/money')
 }
 
 if (props.id && !existing) router.replace('/money')
+if (props.recurringId && !rule) router.replace('/settings/recurring')
 
-const type = ref<TransactionRow['type']>(existing?.type ?? 'expense')
-const digits = ref(existing ? String(existing.amount) : '')
-const categoryId = ref<string | null>(existing?.category_id ?? null)
+const source = existing ?? rule
+// A new entry can arrive prefilled from an iPhone shortcut (DECISIONS 54).
+const quick: QuickAdd = source ? {} : parseQuickAdd(route.query)
+const type = ref<TransactionRow['type']>(source?.type ?? quick.type ?? 'expense')
+const digits = ref(source ? String(source.amount) : quick.amount ? String(quick.amount) : '')
+const categoryId = ref<string | null>(source?.category_id ?? null)
 const gigId = ref<string | null>(existing?.gig_id ?? null)
 const date = ref(
-  existing?.date ?? (typeof route.query.date === 'string' ? route.query.date : todayKey()),
+  existing?.date ??
+    rule?.start_date ??
+    (typeof route.query.date === 'string' ? route.query.date : todayKey()),
 )
-const note = ref(existing?.note ?? '')
+const note = ref(source?.note ?? quick.note ?? '')
 const saving = ref(false)
 const failed = ref(false)
 
@@ -53,7 +80,15 @@ const typeOptions = computed(() => [
 ])
 const typeCategories = computed(() => categories.ofType(type.value))
 
-// A new entry starts on the first category of its type; switching type picks again.
+// A new entry starts on the shortcut's category, else the first of its type; switching type
+// picks again.
+if (!categoryId.value && quick.category) {
+  const wanted = quick.category.toLowerCase()
+  categoryId.value =
+    typeCategories.value.find((c) =>
+      [c.key, c.name_zh, c.name_en].some((n) => n?.toLowerCase() === wanted),
+    )?.id ?? null
+}
 if (!categoryId.value) categoryId.value = typeCategories.value[0]?.id ?? null
 watch(type, () => {
   categoryId.value = typeCategories.value[0]?.id ?? null
@@ -96,6 +131,25 @@ function pickGig(id: string | null) {
   }
 }
 
+// ---- 固定收支 (DECISIONS 53) ----
+type Repeat = 'none' | RecurringRow['frequency']
+const queryRepeat =
+  route.query.repeat === 'month' || route.query.repeat === 'year' ? route.query.repeat : null
+const repeat = ref<Repeat>(rule?.frequency ?? queryRepeat ?? 'none')
+const repeatOptions = computed(() =>
+  (rule ? ['month', 'year'] : ['none', 'month', 'year']).map((value) => ({
+    value: value as Repeat,
+    label: t(`recurring.${value}`),
+  })),
+)
+// An entry recorded by a rule shows the rule instead; gig income never repeats.
+const canRepeat = computed(() => !ruleOfEntry && !pickedGig.value)
+const scope = ref<'this' | 'future'>('this')
+const scopeOptions = computed(() => [
+  { value: 'this' as const, label: t('recurring.scopeThis') },
+  { value: 'future' as const, label: t('recurring.scopeFuture') },
+])
+
 // ---- what saving updates ----
 const shortDate = computed(() =>
   date.value
@@ -110,6 +164,11 @@ const syncLines = computed(() => {
   ]
   if (type.value === 'expense') lines.push(t('addMoney.syncBudget'))
   if (pickedGig.value) lines.push(t('addMoney.gigSync', { brand: pickedGig.value.brand }))
+  if (repeat.value !== 'none' && canRepeat.value && date.value) {
+    const schedule = scheduleLabel({ frequency: repeat.value, start_date: date.value })
+    lines.push(t('recurring.autoLine', { schedule }))
+    if (date.value > todayKey()) lines.push(t('recurring.firstOn', { date: shortDate.value }))
+  }
   return lines
 })
 
@@ -130,9 +189,50 @@ async function save() {
     date: date.value,
     note: note.value.trim() || null,
   }
+  const ruleFields = {
+    type: fields.type,
+    amount: fields.amount,
+    category_id: fields.category_id,
+    note: fields.note,
+  }
+  const today = todayKey()
   try {
-    if (existing) await updateTransaction(existing.id, fields)
-    else await recordTransaction(fields)
+    if (rule && repeat.value !== 'none') {
+      await updateRecurring(
+        rule.id,
+        { ...ruleFields, frequency: repeat.value, start_date: date.value },
+        today,
+      )
+    } else if (existing) {
+      const tx = await updateTransaction(existing.id, fields)
+      if (ruleOfEntry && scope.value === 'future') {
+        await updateRecurring(ruleOfEntry.id, ruleFields, today)
+      } else if (canRepeat.value && repeat.value !== 'none') {
+        await makeEntryRecurring(tx, repeat.value)
+      }
+    } else if (canRepeat.value && repeat.value !== 'none') {
+      await createRecurring(
+        { ...ruleFields, frequency: repeat.value, start_date: date.value },
+        today,
+      )
+    } else {
+      await recordTransaction(fields)
+    }
+    leave()
+  } catch (error) {
+    console.error(error)
+    failed.value = true
+  } finally {
+    saving.value = false
+  }
+}
+
+async function stopRepeat() {
+  if (!ruleOfEntry) return
+  saving.value = true
+  failed.value = false
+  try {
+    await deleteRecurring(ruleOfEntry.id)
     leave()
   } catch (error) {
     console.error(error)
@@ -143,11 +243,12 @@ async function save() {
 }
 
 async function remove() {
-  if (!existing) return
+  if (!existing && !rule) return
   saving.value = true
   failed.value = false
   try {
-    await money.remove(existing.id)
+    if (rule) await deleteRecurring(rule.id)
+    else await money.remove(existing!.id)
     leave()
   } catch (error) {
     console.error(error)
@@ -161,7 +262,7 @@ async function remove() {
 <template>
   <main class="page add-money">
     <AddHeader
-      :title="t(existing ? 'addMoney.editEntry' : 'money.addEntry')"
+      :title="t(rule ? 'recurring.edit' : existing ? 'addMoney.editEntry' : 'money.addEntry')"
       :can-save="canSave"
       @save="save"
     >
@@ -169,7 +270,7 @@ async function remove() {
         <SegmentedControl
           v-model="type"
           :options="typeOptions"
-          :label="t(existing ? 'addMoney.editEntry' : 'money.addEntry')"
+          :label="t(rule ? 'recurring.edit' : existing ? 'addMoney.editEntry' : 'money.addEntry')"
         />
       </template>
     </AddHeader>
@@ -229,7 +330,7 @@ async function remove() {
 
       <div class="card rows">
         <div class="row">
-          <label for="money-date">{{ t('common.date') }}</label>
+          <label for="money-date">{{ t(rule ? 'recurring.startDate' : 'common.date') }}</label>
           <input id="money-date" v-model="date" class="value-input" type="date" required />
         </div>
         <div class="row">
@@ -245,12 +346,52 @@ async function remove() {
         </div>
       </div>
 
+      <div v-if="ruleOfEntry" class="card field recurring">
+        <p class="recurring-text">
+          {{ t('recurring.isRecurring', { schedule: scheduleLabel(ruleOfEntry) }) }}
+        </p>
+        <span class="sub">{{ t('recurring.scope') }}</span>
+        <SegmentedControl v-model="scope" :options="scopeOptions" :label="t('recurring.scope')" />
+        <DeleteButton
+          :label="t('recurring.stop')"
+          :hint="t('recurring.stopHint')"
+          :busy="saving"
+          @confirm="stopRepeat"
+        />
+      </div>
+      <div v-else-if="canRepeat" class="card rows">
+        <fieldset class="row stacked">
+          <legend class="row-legend">{{ t('recurring.repeat') }}</legend>
+          <div class="grid-3">
+            <button
+              v-for="r in repeatOptions"
+              :key="r.value"
+              type="button"
+              class="chip"
+              :class="{ on: repeat === r.value }"
+              :aria-pressed="repeat === r.value"
+              @click="repeat = r.value"
+            >
+              {{ r.label }}
+            </button>
+          </div>
+        </fieldset>
+      </div>
+
       <SyncSummary :lines="syncLines" />
 
       <DeleteButton
-        v-if="existing"
-        :label="t('addMoney.deleteEntry')"
-        :hint="existing.gig_id ? t('addMoney.deleteGigHint') : undefined"
+        v-if="existing || rule"
+        :label="t(rule ? 'recurring.stop' : 'addMoney.deleteEntry')"
+        :hint="
+          rule
+            ? t('recurring.stopHint')
+            : ruleOfEntry
+              ? t('recurring.deleteHint')
+              : existing?.gig_id
+                ? t('addMoney.deleteGigHint')
+                : undefined
+        "
         :busy="saving"
         @confirm="remove"
       />
@@ -263,6 +404,16 @@ async function remove() {
 <style scoped>
 .add-money .page-body {
   padding-bottom: 12px;
+}
+
+.recurring {
+  gap: 10px;
+}
+
+.recurring-text {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .amount-card {

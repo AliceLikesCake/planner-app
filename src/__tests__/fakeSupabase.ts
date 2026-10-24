@@ -48,6 +48,12 @@ const DEFAULTS: Record<string, Row> = {
     category_id: null,
     note: null,
     gig_id: null,
+    recurring_id: null,
+  },
+  recurring_transactions: {
+    category_id: null,
+    note: null,
+    last_date: null,
   },
   habits: {
     goal: null,

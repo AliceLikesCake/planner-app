@@ -11,6 +11,7 @@ import { currentSavings, formatMoney } from '@/services/money'
 import { useAuthStore } from '@/stores/auth'
 import { useCategoriesStore } from '@/stores/categories'
 import { useMoneyStore } from '@/stores/money'
+import { useRecurringStore } from '@/stores/recurring'
 import { useSettingsStore } from '@/stores/settings'
 import { paletteVars } from '@/styles/palette'
 import type { Locale } from '@/i18n'
@@ -21,6 +22,7 @@ const settings = useSettingsStore()
 const auth = useAuthStore()
 const categories = useCategoriesStore()
 const money = useMoneyStore()
+const recurring = useRecurringStore()
 const { error, showError } = useErrorToast()
 
 type BoolField = {
@@ -154,6 +156,13 @@ const sections = computed<{ title: string; rows: Row[] }[]>(() => [
         label: t('settings.savings'),
         value: savings.value === null ? t('settings.unset') : formatMoney(savings.value),
         to: '/settings/savings',
+      },
+      {
+        kind: 'link',
+        label: t('recurring.title'),
+        sub: t('recurring.sub'),
+        value: recurring.items.length ? t('recurring.count', { n: recurring.items.length }) : '',
+        to: '/settings/recurring',
       },
       {
         kind: 'link',

@@ -76,6 +76,17 @@ const router = createRouter({
       props: true,
     },
     {
+      path: '/edit/recurring/:recurringId',
+      name: 'edit-recurring',
+      component: () => import('@/views/add/AddMoney.vue'),
+      props: true,
+    },
+    {
+      path: '/settings/recurring',
+      name: 'settings-recurring',
+      component: () => import('@/views/settings/Recurring.vue'),
+    },
+    {
       path: '/edit/event/:id',
       name: 'edit-event',
       component: () => import('@/views/add/AddEvent.vue'),
