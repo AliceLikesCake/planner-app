@@ -113,7 +113,15 @@
     "currentStreak": "目前連續",
     "bestStreak": "最長連續",
     "days": "{n} 天",
-    "addHabit": "新增習慣"
+    "addHabit": "新增習慣",
+    "noHabits": "還沒有習慣，按右下角的 ＋ 新增一個",
+    "noneToday": "今天沒有要做的習慣，休息一下吧",
+    "popAria": "戳破：{name}",
+    "undoAria": "復原：{name}",
+    "summary": "{name} · {pct}%",
+    "editHabit": "編輯習慣",
+    "edit": "編輯",
+    "recordTabs": "選擇要看的習慣"
   },
   "gigs": {
     "title": "接案管理",
@@ -258,5 +266,34 @@
     "deleteEvent": "刪除這個行程",
     "deleteHint": "它產生的今日待辦也會一起刪除",
     "notFound": "找不到這個行程"
+  },
+  "palette": {
+    "blue": "霧藍",
+    "lav": "薰衣草",
+    "green": "鼠尾草",
+    "peach": "蜜桃",
+    "butter": "奶油黃",
+    "rose": "乾燥玫瑰",
+    "mint": "薄荷",
+    "pink": "粉紅",
+    "sand": "奶茶"
+  },
+  "addHabit": {
+    "name": "習慣名稱",
+    "namePlaceholder": "例如：伸展",
+    "goal": "目標（會寫在泡泡上）",
+    "goalPlaceholder": "例如：每天 15 分鐘",
+    "color": "泡泡顏色",
+    "days": "哪幾天要做",
+    "everyDay": "每天",
+    "perWeek": "每週 {n} 天",
+    "pickADay": "至少選一天",
+    "weekdayAria": "{day}",
+    "remind": "每日提醒",
+    "remindSub": "還沒戳破時，{time} 提醒我",
+    "syncBubble": "習慣頁多一顆泡泡，選的那幾天才會出現",
+    "syncRecord": "每月紀錄多一個分頁，記錄連續天數",
+    "deleteHabit": "刪除這個習慣",
+    "deleteHint": "所有打卡紀錄也會一起刪除"
   }
 }

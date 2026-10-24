@@ -58,6 +58,12 @@ const router = createRouter({
       props: true,
     },
     {
+      path: '/edit/habit/:id',
+      name: 'edit-habit',
+      component: () => import('@/views/add/AddHabit.vue'),
+      props: true,
+    },
+    {
       path: '/edit/event/:id',
       name: 'edit-event',
       component: () => import('@/views/add/AddEvent.vue'),

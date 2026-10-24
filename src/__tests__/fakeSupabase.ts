@@ -26,6 +26,14 @@ const DEFAULTS: Record<string, Row> = {
     gig_kind: null,
     event_id: null,
   },
+  habits: {
+    goal: null,
+    color: 'blue',
+    weekdays: [1, 2, 3, 4, 5, 6, 7],
+    remind: true,
+    sort: 0,
+    archived: false,
+  },
   events: {
     category_id: null,
     all_day: true,

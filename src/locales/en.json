@@ -112,8 +112,16 @@
     "monthDone": "Done this month",
     "currentStreak": "Current streak",
     "bestStreak": "Best streak",
-    "days": "{n} days",
-    "addHabit": "Add habit"
+    "days": "{n} day | {n} days",
+    "addHabit": "Add habit",
+    "noHabits": "No habits yet. Tap ＋ to add one.",
+    "noneToday": "No habits scheduled today. Take a break!",
+    "popAria": "Pop: {name}",
+    "undoAria": "Undo: {name}",
+    "summary": "{name} · {pct}%",
+    "editHabit": "Edit habit",
+    "edit": "Edit",
+    "recordTabs": "Choose a habit to view"
   },
   "gigs": {
     "title": "Gigs",
@@ -258,5 +266,34 @@
     "deleteEvent": "Delete this event",
     "deleteHint": "Its to-dos on the Today page go too",
     "notFound": "This event no longer exists"
+  },
+  "palette": {
+    "blue": "Misty blue",
+    "lav": "Lavender",
+    "green": "Sage",
+    "peach": "Peach",
+    "butter": "Butter",
+    "rose": "Dusty rose",
+    "mint": "Mint",
+    "pink": "Pink",
+    "sand": "Milk tea"
+  },
+  "addHabit": {
+    "name": "Habit name",
+    "namePlaceholder": "e.g. Stretch",
+    "goal": "Goal (shown on the bubble)",
+    "goalPlaceholder": "e.g. 15 minutes a day",
+    "color": "Bubble color",
+    "days": "Which days",
+    "everyDay": "Every day",
+    "perWeek": "{n} days a week",
+    "pickADay": "Pick at least one day",
+    "weekdayAria": "{day}",
+    "remind": "Daily reminder",
+    "remindSub": "Remind me at {time} if it isn’t popped yet",
+    "syncBubble": "A new bubble on the Habits page, only on the days you picked",
+    "syncRecord": "A new tab in the monthly record, tracking your streak",
+    "deleteHabit": "Delete this habit",
+    "deleteHint": "All of its check-ins go too"
   }
 }

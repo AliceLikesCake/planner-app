@@ -3,6 +3,8 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import Cake from '@/components/cake/Cake.vue'
+import ErrorToast from '@/components/ErrorToast.vue'
+import SoundToggle from '@/components/SoundToggle.vue'
 import TaskRow from '@/components/TaskRow.vue'
 import { computeLayers, type CakeTask } from '@/components/cake/layers'
 import {
@@ -11,9 +13,10 @@ import {
   isDessertId,
   type DessertId,
 } from '@/components/cake/desserts'
+import { useErrorToast } from '@/composables/useErrorToast'
 import { useToday } from '@/composables/useToday'
 import { fromKey, shortTime, weekdayIndex, weekOf } from '@/services/dates'
-import { playAllDone, playSoundOn, playStack, playUndo } from '@/services/sound'
+import { playAllDone, playStack, playUndo } from '@/services/sound'
 import { useCategoriesStore } from '@/stores/categories'
 import { useSettingsStore } from '@/stores/settings'
 import { useTasksStore, type TaskOccurrence } from '@/stores/tasks'
@@ -92,24 +95,7 @@ const message = computed(() => {
 
 // ---- interactions ----
 const soundOn = computed(() => settings.row?.sound ?? true)
-const error = ref('')
-let errorTimer: ReturnType<typeof setTimeout> | undefined
-
-function showError() {
-  error.value = t('today.saveError')
-  clearTimeout(errorTimer)
-  errorTimer = setTimeout(() => (error.value = ''), 4000)
-}
-
-async function toggleSound() {
-  const next = !soundOn.value
-  if (next) playSoundOn()
-  try {
-    await settings.update({ sound: next })
-  } catch {
-    showError()
-  }
-}
+const { error, showError } = useErrorToast()
 
 // Only one row is swiped open at a time.
 const openId = ref<string | null>(null)
@@ -149,30 +135,7 @@ async function toggle(item: TaskOccurrence) {
     <header class="top">
       <h1 class="date">{{ dateLabel }}</h1>
       <div class="actions">
-        <button
-          type="button"
-          class="icon-btn sound"
-          :class="{ off: !soundOn }"
-          :aria-pressed="soundOn"
-          :aria-label="t(soundOn ? 'common.soundOn' : 'common.soundOff')"
-          @click="toggleSound"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z" />
-            <path v-if="soundOn" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" />
-            <path v-else d="M16 10l5 5M21 10l-5 5" />
-          </svg>
-        </button>
+        <SoundToggle @error="showError" />
         <RouterLink to="/settings" class="icon-btn" :aria-label="t('common.settings')">
           <svg
             width="20"
@@ -256,7 +219,7 @@ async function toggle(item: TaskOccurrence) {
       <p v-if="!items.length" class="empty">{{ t('today.empty') }}</p>
     </div>
 
-    <p v-if="error" class="toast" role="alert">{{ error }}</p>
+    <ErrorToast :message="error" />
   </main>
 </template>
 
@@ -282,12 +245,6 @@ async function toggle(item: TaskOccurrence) {
 .actions {
   display: flex;
   gap: 8px;
-}
-
-.sound.off {
-  background: var(--surface);
-  color: var(--muted);
-  border: 1px solid var(--chip);
 }
 
 /* ---- dessert card (stays put while the list scrolls) ---- */
@@ -432,20 +389,5 @@ async function toggle(item: TaskOccurrence) {
   text-align: center;
   font-size: 14px;
   color: var(--muted);
-}
-
-.toast {
-  position: absolute;
-  left: 16px;
-  right: 16px;
-  bottom: calc(var(--nav-height) + 88px);
-  margin: 0;
-  padding: 12px 16px;
-  border-radius: 16px;
-  background: var(--overdue-bg);
-  color: var(--overdue-fg);
-  font-size: 14px;
-  text-align: center;
-  z-index: 10;
 }
 </style>
