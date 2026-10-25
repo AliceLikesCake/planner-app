@@ -62,7 +62,7 @@ function toggleDay(iso: number) {
 const dayHint = computed(() => {
   const n = weekdays.value.length
   if (n === 0) return t('addHabit.pickADay')
-  return n === 7 ? t('addHabit.everyDay') : t('addHabit.perWeek', { n })
+  return n === 7 ? t('addHabit.everyDay') : t('addHabit.perWeek', { n }, n)
 })
 
 const remindTime = computed(() => shortTime(settings.row?.habit_remind_time) || '21:30')

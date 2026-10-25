@@ -235,7 +235,7 @@ const isPast = computed(() => selected.value < today.value)
         <div class="panel-head">
           <h2 class="panel-title">{{ selectedLabel }}</h2>
           <span v-if="dayEvents.length" class="panel-count">{{
-            t('calendar.events', { n: dayEvents.length })
+            t('calendar.events', { n: dayEvents.length }, dayEvents.length)
           }}</span>
         </div>
         <RouterLink

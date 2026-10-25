@@ -88,10 +88,10 @@ const baseName = computed(() => {
 
 const fileMeta = computed(() => {
   if (!sheets.value.length) return t('export.pickOne')
-  const rows = t('export.rows', { n: totalRows.value })
+  const rows = t('export.rows', { n: totalRows.value }, totalRows.value)
   if (format.value === 'csv')
     return sheets.value.length > 1 ? `${t('export.csvFiles')} · ${rows}` : rows
-  return `${t('export.sheets', { n: sheets.value.length })} · ${rows}`
+  return `${t('export.sheets', { n: sheets.value.length }, sheets.value.length)} · ${rows}`
 })
 
 // ---- export ----
@@ -175,7 +175,7 @@ const rangeText = computed(() => `${range.value.start} – ${range.value.end}`.r
             <span>{{ t(`export.item.${c}`) }}</span>
             <span class="sub">{{ t(`export.itemSub.${c}`) }}</span>
           </span>
-          <span class="sub num">{{ t('export.count', { n: countOf(c) }) }}</span>
+          <span class="sub num">{{ t('export.count', { n: countOf(c) }, countOf(c)) }}</span>
         </button>
       </fieldset>
 

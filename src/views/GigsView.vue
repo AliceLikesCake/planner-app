@@ -188,6 +188,7 @@ async function step(gig: GigRow, key: GigStep) {
   gap: 4px;
   padding: 12px;
   border-radius: 20px;
+  container-type: inline-size;
 }
 
 .stat-label {
@@ -199,6 +200,11 @@ async function step(gig: GigRow, key: GigStep) {
   font-family: var(--font-display);
   font-size: 19px;
   overflow-wrap: anywhere;
+}
+
+/* "NT$20,000" is longer than "$20,000": shrink to fit the card so it stays on one line. */
+:lang(en) .stat-value {
+  font-size: min(19px, 17cqi);
 }
 
 .stat.paid {
